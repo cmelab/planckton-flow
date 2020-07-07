@@ -1,0 +1,11 @@
+*.gsd
+.ipynb_checkpoints/
+Untitled.ipynb
+*.out
+status.txt
+workspace/
+.bundles/
+old/
+signac.rc
+fry/
+kestrel/
