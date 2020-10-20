@@ -13,8 +13,8 @@
 #SBATCH --gres gpu:{{ gpus }}
 {% endif %}
 {% if job_output %}
-#SBATCH --output={{ job_output }}
-#SBATCH --error={{ job_output }}
+#SBATCH --output=workspace/{{ operations[0].job }}/job_%j.o
+#SBATCH --error=workspace/{{ operations[0].job }}/job_%j.e
 {% endif %}
 {% block tasks %}
 #SBATCH --ntasks={{ np_global }}
