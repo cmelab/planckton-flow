@@ -1,34 +1,33 @@
-# PlanckTon-Flow
+# PlanckTon-flow
 
 ## How to use (local)
 
 ### Install
 
-First, install planckton:
+First, install [PlanckTon](https://github.com/cmelab/planckton):
 
 ```
-git clone git@bitbucket.org:cmelab/planckton.git
+git clone git@github.com:cmelab/planckton.git
 cd planckton
-pip install -r requirements.txt
-pip install .
-pytest # Run tests
+conda env create -f environment.yml
+conda activate planckton
+pytest
 ```
 
-Now to get planckton-flow:
+Now to get PlanckTon-flow:
 
 ```
-git clone git@bitbucket.org:cmelab/planckton-flow.git
+git clone git@github.com:cmelab/planckton-flow.git
 cd planckton-flow
-pip install -r requirements.txt
 ```
-Planckton-flow is not a python package, so it does not need to be installed.
-Before using planckton-flow, read over [Signac and Signac-flow](http://docs.signac.io)
+PlanckTon-flow is not a python package, so it does not need to be installed.
+Before using PlanckTon-flow, read over [Signac and Signac-flow](http://docs.signac.io)
 
-In order to use planckton-flow, the planckton singularity must be pulled to your machine and its location assigned the environment variable `$PLANCKTON_SIMG`.
+In order to use PlanckTon-flow, the PlanckTon container must be pulled to your machine and its location assigned the environment variable `$PLANCKTON_SIMG`.
 For example:
 ```
-singularity pull docker://cmelab/planckton
-export PLANCKTON_SIMG="/home/erjank_project/singularity_images/planckton.simg"
+singularity pull docker://cmelab/planckton_cpu:0.1.4
+export PLANCKTON_SIMG="/home/erjank_project/singularity_images/planckton_cpu_0.1.4.sif"
 ```
 
 The basic workflow is something like this:
@@ -55,7 +54,7 @@ When working on a cluster, we will be using singularity.
 We assume the image is located `~/planckton/`.
 
 So, `cd ~/planckton` then `singularity pull docker://cmelab/planckton:beta`
-See this [wiki page](https://bitbucket.org/cmelab/getting-started/wiki/Clusters:%20Tips%20&%20Tricks%20(The%209th%20one%20will%20SHOCK%20you)) for per-cluster tips.
+See this [wiki page](https://github.com/cmelab/getting-started/blob/master/wiki/Clusters:%20Tips%20%26%20Tricks%20(The%209th%20one%20will%20SHOCK%20you).md) for per-cluster tips.
 
 Then the workflow is the same as local, except now the jobs will be submitted to the scheduler 
 ```
