@@ -1,6 +1,6 @@
 *.gsd
 .ipynb_checkpoints/
-Untitled.ipynb
+*.ipynb
 *.out
 status.txt
 workspace/
