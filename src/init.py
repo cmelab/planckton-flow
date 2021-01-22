@@ -8,9 +8,8 @@ from collections import OrderedDict
 from itertools import product
 
 import signac
-import unyt as u
 
-from planckton.utils import unit_conversions
+from planckton.utils import units
 
 
 def get_parameters():
@@ -18,32 +17,32 @@ def get_parameters():
     parameters = OrderedDict()
     # Parameters used for generating the morphology
     parameters["molecule"] = [
-        "CZTPTZ8FITIC",
-        "CZTPTZITIC",
+        #"CZTPTZ8FITIC",
+        #"CZTPTZITIC",
         "PCBM",
-        "P3HT_16",
-        "ITIC",
-        "ITIC-Th",
-        "IEICO",
-        "IDT-2BR",
-        "EH-IDTBR",
-        "TruxTP6FITIC",
-        "TruxTPITIC",
+        #"P3HT_16",
+        #"ITIC",
+        #"ITIC-Th",
+        #"IEICO",
+        #"IDT-2BR",
+        #"EH-IDTBR",
+        #"TruxTP6FITIC",
+        #"TruxTPITIC",
     ]
     parameters["n_compounds"] = [100, 1000]
-    parameters["density"] = [1.0 * u.g / u.cm**3]
+    parameters["density"] = [(1.0, "g/cm**3")]
     parameters["e_factor"] = [0.5]
 
     # Reduced temperatures can be specified by converting from SI:
     # Assuming sulfur from opv gaff
-    ref_energy = 1.046 * u.kJ / u.mol
-    parameters["kT_reduced"] = []
-    for T_SI in [275 * u.Kelvin, 300 * u.Kelvin]:
-        parameters["kT_reduced"].append(
-                unit_conversions.reduced_from_kelvin(T_SI, ref_energy)
-                )
+    #ref_energy = 1.046 #* u.kJ / u.mol
+    #parameters["kT_reduced"] = []
+    #for T_SI in [275,300]: #[275 * u.Kelvin, 300 * u.Kelvin]:
+    #    parameters["kT_reduced"].append(
+    #            units.reduced_from_kelvin(T_SI, ref_energy)
+    #            )
     # or manually:
-    # parameters["kT_reduced"] = [0.5, 0.75, 1.0]
+    parameters["kT_reduced"] = [0.5, 0.75, 1.0]
 
     # Simulation parameters
     parameters["tau"] = [3]
