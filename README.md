@@ -72,7 +72,7 @@ python src/init.py
 ```
 3. Check to make sure your jobs look correct
 ```
-python src/project.py --pretend submit
+python src/project.py submit --pretend 
 ```
 4. Submit the project script to run your simulations
 ```
