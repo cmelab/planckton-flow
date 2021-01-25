@@ -32,12 +32,16 @@ export PLANCKTON_SIMG="/home/erjank_project/singularity_images/planckton_cpu_0.1
 
 The basic workflow is something like this:
 
+1. Edit the init file to define state point space
 ```
-# Define state point space
 vim src/init.py
-# Create workspace
+```
+2. Run the init script to create a workspace
+```
 python src/init.py
-# Simulate
+```
+3. Submit the project script to run your simulations
+```
 python src/project.py submit
 ```
 
@@ -51,19 +55,26 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
 * Kestrel
 
 When working on a cluster, we will be using singularity.
-We assume the image is located `~/planckton/`.
+We assume the image is located in `~/planckton/`.
 
-So, `cd ~/planckton` then `singularity pull docker://cmelab/planckton:beta`
+So, `cd ~/planckton` then `singularity pull docker://cmelab/planckton_cpu:0.1.4`
 See this [wiki page](https://github.com/cmelab/getting-started/blob/master/wiki/Clusters:%20Tips%20%26%20Tricks%20(The%209th%20one%20will%20SHOCK%20you).md) for per-cluster tips.
 
 Then the workflow is the same as local, except now the jobs will be submitted to the scheduler 
+
+1. Edit the init file to define state point space
 ```
-# Define state point space
 vim src/init.py
-# Create workspace
+```
+2. Run the init script to create a workspace
+```
 python src/init.py
-# Check to make sure things look correct
+```
+3. Check to make sure your jobs look correct
+```
 python src/project.py --pretend submit
-# Simulate
+```
+4. Submit the project script to run your simulations
+```
 python src/project.py submit
 ```
