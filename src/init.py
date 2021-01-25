@@ -13,7 +13,6 @@ from planckton.utils import units
 
 
 def get_parameters():
-
     parameters = OrderedDict()
     # Parameters used for generating the morphology
     parameters["molecule"] = [
