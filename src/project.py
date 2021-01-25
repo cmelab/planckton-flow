@@ -43,7 +43,9 @@ class Fry(DefaultSlurmEnvironment):
     @classmethod
     def add_args(cls, parser):
         parser.add_argument(
-            "--partition", default="batch", help="Specify the partition to submit to."
+            "--partition",
+            default="batch",
+            help="Specify the partition to submit to."
         )
 
 
@@ -54,7 +56,9 @@ class Kestrel(DefaultSlurmEnvironment):
     @classmethod
     def add_args(cls, parser):
         parser.add_argument(
-            "--partition", default="batch", help="Specify the partition to submit to."
+            "--partition",
+            default="batch",
+            help="Specify the partition to submit to."
         )
 
 
@@ -111,16 +115,15 @@ def sample(job):
     from planckton.init import Compound, Pack
     from planckton.compounds import COMPOUND_FILE
     from planckton.force_fields import FORCE_FIELD
-    from planckton.utils import base_units, unit_conversions
+    from planckton.utils import units
 
     with job:
-        units = base_units.base_units()
         compound = Compound(COMPOUND_FILE[job.sp.molecule])
         packer = Pack(
             compound,
             ff_file=FORCE_FIELD["opv_gaff"],
             n_compounds=job.sp.n_compounds,
-            density=job.sp.density,
+            density=units.tuple_to_quantity(job.sp.density),
             remove_hydrogen_atoms=job.sp.remove_hydrogens,
         )
 
@@ -128,7 +131,7 @@ def sample(job):
             logging.info("Creating Init")
             packer.pack()
         logging.info("target length should be", packer.L)
-        L = packer.L / units["distance"]
+        L = packer.L #/ units["distance"]
 
         my_sim = Simulation(
             "init.hoomdxml",
@@ -145,9 +148,9 @@ def sample(job):
 
         for key, pair in units.items():
             job.doc[key] = pair
-        job.doc["T_SI"] = unit_conversions.kelvin_from_reduced(job.sp.kT_reduced)
+        job.doc["T_SI"] = units.kelvin_from_reduced(job.sp.kT_reduced)
         job.doc["T_unit"] = "K"
-        job.doc["real_timestep"] = unit_conversions.convert_to_real_time(job.sp.dt)
+        job.doc["real_timestep"] = units.convert_to_real_time(job.sp.dt)
         job.doc["time_unit"] = "fs"
 
         my_sim.run()
