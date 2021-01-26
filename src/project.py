@@ -77,81 +77,48 @@ def sampled(job):
     return current_step(job) >= job.doc.steps
 
 
-@MyProject.label
-def initialized(job):
-    return job.isfile("init.hoomdxml")
-
-
-# @directives(executable="python -u")
-# @MyProject.operation
-# @MyProject.post(initialized)
-# def initialize(job):
-#   import os
-#   import logging
-#   from planckton.init import Compound, Pack
-#   from planckton.compounds import COMPOUND_FILE
-#   from planckton.force_fields import FORCE_FIELD
-#
-#   with job:
-#       if os.path.isfile("init.hoomdxml"):
-#           logging.info("File exits, skipping init")
-#           return
-#       compound = Compound(COMPOUND_FILE[job.sp.molecule])
-#       packer = Pack(
-#           compound, ff_file=FORCE_FIELD["opv_gaff"], n_compounds=1, density=0.1
-#       )
-#       packer.pack()
-
-
 @directives(executable="python -u")
 @directives(ngpu=1)
 @MyProject.operation
-# @MyProject.pre.after(initialize)
 @MyProject.post(sampled)
 def sample(job):
-    from planckton.sim import Simulation
     import os
     import logging
+    from planckton.sim import Simulation
     from planckton.init import Compound, Pack
-    from planckton.compounds import COMPOUND_FILE
-    from planckton.force_fields import FORCE_FIELD
     from planckton.utils import units
+    from planckton.force_fields import FORCE_FIELD
 
     with job:
-        compound = Compound(COMPOUND_FILE[job.sp.molecule])
+        compound = [Compound(i) for i in job.sp.input]
         packer = Pack(
             compound,
-            ff_file=FORCE_FIELD["opv_gaff"],
+            ff=FORCE_FIELD[job.sp.forcefield],
             n_compounds=job.sp.n_compounds,
             density=units.tuple_to_quantity(job.sp.density),
             remove_hydrogen_atoms=job.sp.remove_hydrogens,
         )
 
-        if not os.path.isfile("init.hoomdxml"):
-            logging.info("Creating Init")
-            packer.pack()
-        logging.info("target length should be", packer.L)
-        L = packer.L #/ units["distance"]
+        system = packer.pack()
+        logging.info("Target length should be ", packer.L)
 
         my_sim = Simulation(
-            "init.hoomdxml",
-            kT=job.sp.kT_reduced,
-            gsd_write=max([int(job.sp.n_steps / 100), 1]),
-            log_write=max([int(job.sp.n_steps / 10000), 1]),
-            e_factor=job.sp.e_factor,
-            n_steps=job.sp.n_steps,
-            tau=job.sp.tau,
-            dt=job.sp.dt,
-            mode="gpu",
-            target_length=L,
+                system,
+                kT=job.sp.kT_reduced,
+                gsd_write=max([int(job.sp.n_steps / 100), 1]),
+                log_write=max([int(job.sp.n_steps / 10000), 1]),
+                e_factor=job.sp.e_factor,
+                n_steps=job.sp.n_steps,
+                shrink_steps=job.sp.shrink_steps,
+                tau=job.sp.tau,
+                dt=job.sp.dt,
+                mode=job.sp.mode,
+                target_length=packer.L,
         )
 
-        for key, pair in units.items():
-            job.doc[key] = pair
-        job.doc["T_SI"] = units.kelvin_from_reduced(job.sp.kT_reduced)
-        job.doc["T_unit"] = "K"
-        job.doc["real_timestep"] = units.convert_to_real_time(job.sp.dt)
-        job.doc["time_unit"] = "fs"
+        # TODO need to add ref values to job doc
+        #job.doc["T_SI"] = units.kelvin_from_reduced(job.sp.kT_reduced)
+        #job.doc["real_timestep"] = units.convert_to_real_time(job.sp.dt)
 
         my_sim.run()
 
