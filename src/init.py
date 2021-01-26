@@ -3,51 +3,71 @@
 
 Iterates over all defined state points and initializes
 the associated job workspace directories."""
-import logging
 from collections import OrderedDict
 from itertools import product
+import logging
+import warnings
 
 import signac
 
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from planckton.compounds import COMPOUND_FILE
 from planckton.utils import units
 
 
 def get_parameters():
-    parameters = OrderedDict()
     # Parameters used for generating the morphology
-    parameters["molecule"] = [
-        #"CZTPTZ8FITIC",
-        #"CZTPTZITIC",
-        "PCBM",
-        #"P3HT_16",
-        #"ITIC",
-        #"ITIC-Th",
-        #"IEICO",
-        #"IDT-2BR",
-        #"EH-IDTBR",
-        #"TruxTP6FITIC",
-        #"TruxTPITIC",
+    parameters = OrderedDict()
+
+    # input can be the path to a molecule file or a SMILES string
+    # COMPOUND_FILE is a dictionary of paths
+    # Mixtures can be specified like so
+    # parameters["input"] = [[COMPOUND_FILE["PCBM"],COMPOUND_FILE["P3HT_16"]]]
+    # note the additional brackets
+    parameters["input"] = [
+        #[COMPOUND_FILE["CZTPTZ8FITIC"]],
+        #[COMPOUND_FILE["CZTPTZITIC"]],
+        [COMPOUND_FILE["PCBM"]],
+        #[COMPOUND_FILE["P3HT_16"]],
+        #[COMPOUND_FILE["ITIC"]],
+        #[COMPOUND_FILE["ITIC-Th"]],
+        #[COMPOUND_FILE["IEICO"]],
+        #[COMPOUND_FILE["IDT-2BR"]],
+        #[COMPOUND_FILE["EH-IDTBR"]],
+        #[COMPOUND_FILE["TruxTP6FITIC"]],
+        #[COMPOUND_FILE["TruxTPITIC"]],
     ]
+
+    # If a mixture is used, the number of each compound in the mixture
+    # needs to be specified:
+    # parameters["n_compounds"] = [(100,100), (1000,500)]
     parameters["n_compounds"] = [100, 1000]
+
+    # Density must be specified as a pair containing (value, unit)
     parameters["density"] = [(1.0, "g/cm**3")]
+    # Energy scaling "solvent" parameter
     parameters["e_factor"] = [0.5]
 
-    # Reduced temperatures can be specified by converting from SI:
-    # Assuming sulfur from opv gaff
-    #ref_energy = 1.046 #* u.kJ / u.mol
-    #parameters["kT_reduced"] = []
-    #for T_SI in [275,300]: #[275 * u.Kelvin, 300 * u.Kelvin]:
-    #    parameters["kT_reduced"].append(
-    #            units.reduced_from_kelvin(T_SI, ref_energy)
-    #            )
-    # or manually:
+    # Force fields are specified as keys to the FORCE_FIELD dictionary in
+    # planckton/force_fields/__init__.py
+    parameters["forcefield"] = ["opv_gaff"]
+
+    # Reduced temperatures specified in simulation units
     parameters["kT_reduced"] = [0.5, 0.75, 1.0]
 
     # Simulation parameters
+    # Thermostat coupling
     parameters["tau"] = [3]
-    parameters["n_steps"] = [1e8]
+    # Number of steps to shrink the box
+    parameters["shrink_steps"] = [1e4]
+    # Number of steps to run final simulation
+    parameters["n_steps"] = [1e4]
+    # Timestep size
     parameters["dt"] = [0.0001]
+    # Whether to remove hydrogen atoms
     parameters["remove_hydrogens"] = [False]  # True or False
+    parameters["mode"] = ["cpu"]  # "cpu" or "gpu"
     return list(parameters.keys()), list(product(*parameters.values()))
 
 
