@@ -82,7 +82,6 @@ def sampled(job):
 @MyProject.operation
 @MyProject.post(sampled)
 def sample(job):
-    import os
     from planckton.sim import Simulation
     from planckton.init import Compound, Pack
     from planckton.utils import units
@@ -99,7 +98,7 @@ def sample(job):
         )
 
         system = packer.pack()
-        print("Target length should be ", packer.L)
+        print(f"Target length should be {packer.L:0.3f}")
 
         my_sim = Simulation(
                 system,
@@ -115,12 +114,26 @@ def sample(job):
                 target_length=packer.L,
         )
 
-        # TODO need to add ref values to job doc
-        #job.doc["T_SI"] = units.kelvin_from_reduced(job.sp.kT_reduced)
-        #job.doc["real_timestep"] = units.convert_to_real_time(job.sp.dt)
 
         my_sim.run()
-        print(my_sim.ref_values)
+
+        ref_distance = my_sim.ref_values.distance * u.Angstrom
+        ref_energy = my_sim.ref_values.energy * u.kcal / u.mol
+        ref_mass = my_sim.ref_values.mass * u.amu
+
+        job.doc["T_SI"] =   units.quantity_to_tuple(
+                units.kelvin_from_reduced(job.sp.kT_reduced, ref_energy)
+                )
+        job.doc["real_timestep"] = units.quantity_to_tuple(
+                units.convert_to_real_time(
+                    job.sp.dt,
+                    ref_mass,
+                    ref_distance,
+                    ref_energy).to("femtosecond")
+                )
+        job.doc["ref_mass"] = units.quantity_to_tuple(ref_mass)
+        job.doc["ref_distance"] = units.quantity_to_tuple(ref_distance)
+        job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
 
 
 if __name__ == "__main__":
