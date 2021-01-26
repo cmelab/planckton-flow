@@ -83,7 +83,6 @@ def sampled(job):
 @MyProject.post(sampled)
 def sample(job):
     import os
-    import logging
     from planckton.sim import Simulation
     from planckton.init import Compound, Pack
     from planckton.utils import units
@@ -100,7 +99,7 @@ def sample(job):
         )
 
         system = packer.pack()
-        logging.info("Target length should be ", packer.L)
+        print("Target length should be ", packer.L)
 
         my_sim = Simulation(
                 system,
@@ -121,6 +120,7 @@ def sample(job):
         #job.doc["real_timestep"] = units.convert_to_real_time(job.sp.dt)
 
         my_sim.run()
+        print(my_sim.ref_values)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,6 @@ Iterates over all defined state points and initializes
 the associated job workspace directories."""
 from collections import OrderedDict
 from itertools import product
-import logging
 import warnings
 
 import signac
@@ -42,7 +41,7 @@ def get_parameters():
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
     # parameters["n_compounds"] = [(100,100), (1000,500)]
-    parameters["n_compounds"] = [100, 1000]
+    parameters["n_compounds"] = [500, 100]
 
     # Density must be specified as a pair containing (value, unit)
     parameters["density"] = [(1.0, "g/cm**3")]
@@ -60,9 +59,9 @@ def get_parameters():
     # Thermostat coupling
     parameters["tau"] = [3]
     # Number of steps to shrink the box
-    parameters["shrink_steps"] = [1e4]
+    parameters["shrink_steps"] = [1e3]
     # Number of steps to run final simulation
-    parameters["n_steps"] = [1e4]
+    parameters["n_steps"] = [1e3]
     # Timestep size
     parameters["dt"] = [0.0001]
     # Whether to remove hydrogen atoms
@@ -84,5 +83,4 @@ def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     main()
