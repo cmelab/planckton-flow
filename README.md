@@ -58,7 +58,6 @@ When working on a cluster, we will be using singularity.
 We assume the image is located in `~/planckton/`.
 
 So, `cd ~/planckton` then `singularity pull docker://cmelab/planckton_cpu:0.1.4`
-See this [wiki page](https://github.com/cmelab/getting-started/blob/master/wiki/Clusters:%20Tips%20%26%20Tricks%20(The%209th%20one%20will%20SHOCK%20you).md) for per-cluster tips.
 
 Then the workflow is the same as local, except now the jobs will be submitted to the scheduler 
 
