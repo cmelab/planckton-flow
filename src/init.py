@@ -31,36 +31,36 @@ parameters = OrderedDict({
         #[COMPOUND_FILE["EH-IDTBR"]],
         #[COMPOUND_FILE["TruxTP6FITIC"]],
         #[COMPOUND_FILE["TruxTPITIC"]],
-    ]
+        ],
 
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
     # "n_compounds" = [(100,100), (1000,500)]
-    "n_compounds": [500, 100]
+    "n_compounds": [500, 100],
 
     # Density must be specified as a pair containing (value, unit)
-    "density": [(1.0, "g/cm**3")]
+    "density": [(1.0, "g/cm**3")],
     # Energy scaling "solvent" parameter
-    "e_factor": [0.5]
+    "e_factor": [0.5],
 
     # Force fields are specified as keys to the FORCE_FIELD dictionary in
     # planckton/force_fields/__init__.py
-    "forcefield": ["opv_gaff"]
+    "forcefield": ["opv_gaff"],
 
     # Reduced temperatures specified in simulation units
-    "kT_reduced": [0.5, 0.75, 1.0]
+    "kT_reduced": [0.5, 0.75, 1.0],
 
     # Simulation parameters
     # Thermostat coupling
-    "tau": [3]
+    "tau": [3],
     # Number of steps to shrink the box
-    "shrink_steps": [1e3]
+    "shrink_steps": [1e3],
     # Number of steps to run final simulation
-    "n_steps": [1e3]
+    "n_steps": [1e3],
     # Timestep size
-    "dt": [0.0001]
+    "dt": [0.0001],
     # Whether to remove hydrogen atoms
-    "remove_hydrogens": [False]  # True or False
+    "remove_hydrogens": [False],  # True or False
     "mode": ["cpu"]  # "cpu" or "gpu"
 })
 
@@ -69,7 +69,7 @@ def get_parameters(parameters):
     return list(parameters.keys()), list(product(*parameters.values()))
 
 
-def main():
+def main(parameters):
     project = signac.init_project("debug")
     param_names, param_combinations = get_parameters(parameters)
     # Create the generate jobs
@@ -82,4 +82,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(parameters)
