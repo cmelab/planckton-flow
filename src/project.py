@@ -8,6 +8,7 @@ status, execute operations and submit them to a cluster. See also:
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import BridgesEnvironment, CometEnvironment
+import unyt as u
 
 
 class MyProject(FlowProject):
@@ -90,18 +91,18 @@ def sample(job):
     from planckton.force_fields import FORCE_FIELD
 
     with job:
-        with warnings.catchwith warnings.catch_warnings():
+        with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             compound = [Compound(i) for i in job.sp.input]
-        packer = Pack(
-            compound,
-            ff=FORCE_FIELD[job.sp.forcefield],
-            n_compounds=job.sp.n_compounds,
-            density=units.tuple_to_quantity(job.sp.density),
-            remove_hydrogen_atoms=job.sp.remove_hydrogens,
-        )
+            packer = Pack(
+                compound,
+                ff=FORCE_FIELD[job.sp.forcefield],
+                n_compounds=job.sp.n_compounds,
+                density=units.tuple_to_quantity(job.sp.density),
+                remove_hydrogen_atoms=job.sp.remove_hydrogens,
+            )
 
-        system = packer.pack()
+            system = packer.pack()
         print(f"Target length should be {packer.L:0.3f}")
 
         my_sim = Simulation(
