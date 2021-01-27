@@ -82,13 +82,17 @@ def sampled(job):
 @MyProject.operation
 @MyProject.post(sampled)
 def sample(job):
+    import warnings
+
     from planckton.sim import Simulation
     from planckton.init import Compound, Pack
     from planckton.utils import units
     from planckton.force_fields import FORCE_FIELD
 
     with job:
-        compound = [Compound(i) for i in job.sp.input]
+        with warnings.catchwith warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            compound = [Compound(i) for i in job.sp.input]
         packer = Pack(
             compound,
             ff=FORCE_FIELD[job.sp.forcefield],

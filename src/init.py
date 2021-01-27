@@ -5,13 +5,10 @@ Iterates over all defined state points and initializes
 the associated job workspace directories."""
 from collections import OrderedDict
 from itertools import product
-import warnings
 
 import signac
 
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from planckton.compounds import COMPOUND_FILE
+from planckton.compounds import COMPOUND_FILE
 from planckton.utils import units
 
 
