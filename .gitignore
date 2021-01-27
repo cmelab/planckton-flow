@@ -11,4 +11,4 @@ old/
 signac.rc
 fry/
 kestrel/
-signac_statepoints.json
+*.json
