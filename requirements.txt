@@ -1,0 +1,4 @@
+signac
+signac-flow
+jinja2
+gsd
