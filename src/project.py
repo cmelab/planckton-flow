@@ -8,7 +8,6 @@ status, execute operations and submit them to a cluster. See also:
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import BridgesEnvironment, CometEnvironment
-import unyt as u
 
 
 class MyProject(FlowProject):
@@ -78,6 +77,14 @@ def sampled(job):
     return current_step(job) >= job.doc.steps
 
 
+def get_paths(key):
+    from planckton.compounds import COMPOUND_FILE
+    try:
+        return COMPOUND_FILE[key]
+    except KeyError:
+        return key
+
+
 @directives(executable="python -u")
 @directives(ngpu=1)
 @MyProject.operation
@@ -85,15 +92,19 @@ def sampled(job):
 def sample(job):
     import warnings
 
+    import unyt as u
+
     from planckton.sim import Simulation
     from planckton.init import Compound, Pack
     from planckton.utils import units
     from planckton.force_fields import FORCE_FIELD
 
+
     with job:
+        inputs = [get_paths(i) for i in job.sp.input]
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            compound = [Compound(i) for i in job.sp.input]
+            compound = [Compound(i) for i in inputs]
             packer = Pack(
                 compound,
                 ff=FORCE_FIELD[job.sp.forcefield],
