@@ -1,0 +1,10 @@
+name: planckton-flow
+channels:
+  - conda-forge
+dependencies:
+  - gsd=2.2.0
+  - python=3.7
+  - signac=1.6.0
+  - signac-flow=0.11.0
+  - pip:
+    - pytest
