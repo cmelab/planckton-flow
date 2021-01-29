@@ -1,13 +1,12 @@
 from collections import OrderedDict
 
 import signac
-from planckton.compounds import COMPOUND_FILE
 
 from src import init, project
 
 
 test_params = OrderedDict({
-    "input": [[COMPOUND_FILE["PCBM"]]],
+    "input": [["PCBM"]],
     "n_compounds": [5],
     "density": [(1.0, "g/cm**3")],
     "e_factor": [0.5],

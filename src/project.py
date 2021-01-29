@@ -5,10 +5,10 @@ status, execute operations and submit them to a cluster. See also:
 
     $ python src/project.py --help
 """
+import flow
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import BridgesEnvironment, CometEnvironment
-import unyt as u
 
 
 class MyProject(FlowProject):
@@ -78,22 +78,39 @@ def sampled(job):
     return current_step(job) >= job.doc.steps
 
 
-@directives(executable="python -u")
+def get_paths(key):
+    from planckton.compounds import COMPOUND_FILE
+    try:
+        return COMPOUND_FILE[key]
+    except KeyError:
+        return key
+
+def on_container(func):
+        return flow.directives(
+                executable='singularity exec $PLANCKTON_SIMG python'
+                )(func)
+
+
+@on_container
 @directives(ngpu=1)
 @MyProject.operation
 @MyProject.post(sampled)
 def sample(job):
     import warnings
 
+    import unyt as u
+
     from planckton.sim import Simulation
     from planckton.init import Compound, Pack
     from planckton.utils import units
     from planckton.force_fields import FORCE_FIELD
 
+
     with job:
+        inputs = [get_paths(i) for i in job.sp.input]
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            compound = [Compound(i) for i in job.sp.input]
+            compound = [Compound(i) for i in inputs]
             packer = Pack(
                 compound,
                 ff=FORCE_FIELD[job.sp.forcefield],

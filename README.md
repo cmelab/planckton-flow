@@ -4,30 +4,25 @@
 
 ### Install
 
-First, install [PlanckTon](https://github.com/cmelab/planckton):
-
-```
-git clone git@github.com:cmelab/planckton.git
-cd planckton
-conda env create -f environment.yml
-conda activate planckton
-pytest
-```
-
-Now to get PlanckTon-flow:
-
+1. First download PlanckTon-flow:
 ```
 git clone git@github.com:cmelab/planckton-flow.git
 cd planckton-flow
 ```
+
+2. Then install its requirements:
+```
+pip install -r requirements.txt
+```
+
 PlanckTon-flow is not a python package, so it does not need to be installed.
 Before using PlanckTon-flow, read over [Signac and Signac-flow](http://docs.signac.io)
 
 In order to use PlanckTon-flow, the PlanckTon container must be pulled to your machine and its location assigned the environment variable `$PLANCKTON_SIMG`.
-For example:
+The following example shows the container pulled to a directory called `~/images`:
 ```
 singularity pull docker://cmelab/planckton_cpu:0.1.5
-export PLANCKTON_SIMG="/home/erjank_project/singularity_images/planckton_cpu_0.1.5.sif"
+export PLANCKTON_SIMG="~/images/planckton_cpu_0.1.5.sif"
 ```
 
 The basic workflow is something like this:
@@ -55,10 +50,6 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
 * Kestrel
 
 When working on a cluster, we will be using singularity.
-We assume the image is located in `~/planckton/`.
-
-So, `cd ~/planckton` then `singularity pull docker://cmelab/planckton_cpu:0.1.5`
-
 Then the workflow is the same as local, except now the jobs will be submitted to the scheduler 
 
 1. Edit the init file to define state point space

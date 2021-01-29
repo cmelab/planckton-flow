@@ -8,35 +8,32 @@ from itertools import product
 
 import signac
 
-from planckton.compounds import COMPOUND_FILE
-from planckton.utils import units
-
 
 # Parameters used for generating the morphology
 parameters = OrderedDict({
     # input can be the path to a molecule file or a SMILES string
-    # COMPOUND_FILE is a dictionary of paths
+    # or a key to the COMPOUND_FILE dictionary
     # Mixtures can be specified like so
-    # "input" = [[COMPOUND_FILE["PCBM"],COMPOUND_FILE["P3HT_16"]]]
+    # "input" = [["PCBM", "P3HT_16"]]
     # note the additional brackets
     "input": [
-        #[COMPOUND_FILE["CZTPTZ8FITIC"]],
-        #[COMPOUND_FILE["CZTPTZITIC"]],
-        [COMPOUND_FILE["PCBM"]],
-        #[COMPOUND_FILE["P3HT_16"]],
-        #[COMPOUND_FILE["ITIC"]],
-        #[COMPOUND_FILE["ITIC-Th"]],
-        #[COMPOUND_FILE["IEICO"]],
-        #[COMPOUND_FILE["IDT-2BR"]],
-        #[COMPOUND_FILE["EH-IDTBR"]],
-        #[COMPOUND_FILE["TruxTP6FITIC"]],
-        #[COMPOUND_FILE["TruxTPITIC"]],
+        #["CZTPTZ8FITIC"],
+        #["CZTPTZITIC"],
+        ["PCBM"],
+        #["P3HT_16"],
+        #["ITIC"],
+        #["ITIC-Th"],
+        #["IEICO"],
+        #["IDT-2BR"],
+        #["EH-IDTBR"],
+        #["TruxTP6FITIC"],
+        #["TruxTPITIC"],
         ],
 
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
     # "n_compounds" = [(100,100), (1000,500)]
-    "n_compounds": [500, 100],
+    "n_compounds": [100],
 
     # Density must be specified as a pair containing (value, unit)
     "density": [(1.0, "g/cm**3")],
@@ -48,7 +45,7 @@ parameters = OrderedDict({
     "forcefield": ["opv_gaff"],
 
     # Reduced temperatures specified in simulation units
-    "kT_reduced": [0.5, 0.75, 1.0],
+    "kT_reduced": [1.0],
 
     # Simulation parameters
     # Thermostat coupling
