@@ -1,6 +1,8 @@
+__pycache__
+*.log
 *.gsd
 .ipynb_checkpoints/
-Untitled.ipynb
+*.ipynb
 *.out
 status.txt
 workspace/
@@ -9,3 +11,4 @@ old/
 signac.rc
 fry/
 kestrel/
+*.json

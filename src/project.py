@@ -5,6 +5,7 @@ status, execute operations and submit them to a cluster. See also:
 
     $ python src/project.py --help
 """
+import flow
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import BridgesEnvironment, CometEnvironment
@@ -43,7 +44,9 @@ class Fry(DefaultSlurmEnvironment):
     @classmethod
     def add_args(cls, parser):
         parser.add_argument(
-            "--partition", default="batch", help="Specify the partition to submit to."
+            "--partition",
+            default="batch",
+            help="Specify the partition to submit to."
         )
 
 
@@ -54,7 +57,9 @@ class Kestrel(DefaultSlurmEnvironment):
     @classmethod
     def add_args(cls, parser):
         parser.add_argument(
-            "--partition", default="batch", help="Specify the partition to submit to."
+            "--partition",
+            default="batch",
+            help="Specify the partition to submit to."
         )
 
 
@@ -73,84 +78,84 @@ def sampled(job):
     return current_step(job) >= job.doc.steps
 
 
-@MyProject.label
-def initialized(job):
-    return job.isfile("init.hoomdxml")
+def get_paths(key):
+    from planckton.compounds import COMPOUND_FILE
+    try:
+        return COMPOUND_FILE[key]
+    except KeyError:
+        return key
+
+def on_container(func):
+        return flow.directives(
+                executable='singularity exec $PLANCKTON_SIMG python'
+                )(func)
 
 
-# @directives(executable="python -u")
-# @MyProject.operation
-# @MyProject.post(initialized)
-# def initialize(job):
-#   import os
-#   import logging
-#   from planckton.init import Compound, Pack
-#   from planckton.compounds import COMPOUND_FILE
-#   from planckton.force_fields import FORCE_FIELD
-#
-#   with job:
-#       if os.path.isfile("init.hoomdxml"):
-#           logging.info("File exits, skipping init")
-#           return
-#       compound = Compound(COMPOUND_FILE[job.sp.molecule])
-#       packer = Pack(
-#           compound, ff_file=FORCE_FIELD["opv_gaff"], n_compounds=1, density=0.1
-#       )
-#       packer.pack()
-
-
-@directives(executable="python -u")
+@on_container
 @directives(ngpu=1)
 @MyProject.operation
-# @MyProject.pre.after(initialize)
 @MyProject.post(sampled)
 def sample(job):
+    import warnings
+
+    import unyt as u
+
     from planckton.sim import Simulation
-    import os
-    import logging
     from planckton.init import Compound, Pack
-    from planckton.compounds import COMPOUND_FILE
+    from planckton.utils import units
     from planckton.force_fields import FORCE_FIELD
-    from planckton.utils import base_units, unit_conversions
+
 
     with job:
-        units = base_units.base_units()
-        compound = Compound(COMPOUND_FILE[job.sp.molecule])
-        packer = Pack(
-            compound,
-            ff_file=FORCE_FIELD["opv_gaff"],
-            n_compounds=job.sp.n_compounds,
-            density=job.sp.density,
-            remove_hydrogen_atoms=job.sp.remove_hydrogens,
-        )
+        inputs = [get_paths(i) for i in job.sp.input]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            compound = [Compound(i) for i in inputs]
+            packer = Pack(
+                compound,
+                ff=FORCE_FIELD[job.sp.forcefield],
+                n_compounds=job.sp.n_compounds,
+                density=units.tuple_to_quantity(job.sp.density),
+                remove_hydrogen_atoms=job.sp.remove_hydrogens,
+            )
 
-        if not os.path.isfile("init.hoomdxml"):
-            logging.info("Creating Init")
-            packer.pack()
-        logging.info("target length should be", packer.L)
-        L = packer.L / units["distance"]
+            system = packer.pack()
+        print(f"Target length should be {packer.L:0.3f}")
 
         my_sim = Simulation(
-            "init.hoomdxml",
-            kT=job.sp.kT_reduced,
-            gsd_write=max([int(job.sp.n_steps / 100), 1]),
-            log_write=max([int(job.sp.n_steps / 10000), 1]),
-            e_factor=job.sp.e_factor,
-            n_steps=job.sp.n_steps,
-            tau=job.sp.tau,
-            dt=job.sp.dt,
-            mode="gpu",
-            target_length=L,
+                system,
+                kT=job.sp.kT_reduced,
+                gsd_write=max([int(job.sp.n_steps / 100), 1]),
+                log_write=max([int(job.sp.n_steps / 10000), 1]),
+                e_factor=job.sp.e_factor,
+                n_steps=job.sp.n_steps,
+                shrink_steps=job.sp.shrink_steps,
+                tau=job.sp.tau,
+                dt=job.sp.dt,
+                mode=job.sp.mode,
+                target_length=packer.L,
         )
 
-        for key, pair in units.items():
-            job.doc[key] = pair
-        job.doc["T_SI"] = unit_conversions.kelvin_from_reduced(job.sp.kT_reduced)
-        job.doc["T_unit"] = "K"
-        job.doc["real_timestep"] = unit_conversions.convert_to_real_time(job.sp.dt)
-        job.doc["time_unit"] = "fs"
 
         my_sim.run()
+
+        ref_distance = my_sim.ref_values.distance * u.Angstrom
+        ref_energy = my_sim.ref_values.energy * u.kcal / u.mol
+        ref_mass = my_sim.ref_values.mass * u.amu
+
+        job.doc["T_SI"] =   units.quantity_to_tuple(
+                units.kelvin_from_reduced(job.sp.kT_reduced, ref_energy)
+                )
+        job.doc["real_timestep"] = units.quantity_to_tuple(
+                units.convert_to_real_time(
+                    job.sp.dt,
+                    ref_mass,
+                    ref_distance,
+                    ref_energy).to("femtosecond")
+                )
+        job.doc["ref_mass"] = units.quantity_to_tuple(ref_mass)
+        job.doc["ref_distance"] = units.quantity_to_tuple(ref_distance)
+        job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
 
 
 if __name__ == "__main__":
