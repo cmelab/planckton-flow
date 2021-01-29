@@ -1,3 +1,4 @@
+[![CI](https://github.com/cmelab/planckton-flow/workflows/CI/badge.svg)](https://github.com/cmelab/planckton-flow/actions?query=workflow%3ACI)
 # PlanckTon-Flow
 
 ## How to use (local)
