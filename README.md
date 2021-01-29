@@ -26,8 +26,8 @@ Before using PlanckTon-flow, read over [Signac and Signac-flow](http://docs.sign
 In order to use PlanckTon-flow, the PlanckTon container must be pulled to your machine and its location assigned the environment variable `$PLANCKTON_SIMG`.
 For example:
 ```
-singularity pull docker://cmelab/planckton_cpu:0.1.4
-export PLANCKTON_SIMG="/home/erjank_project/singularity_images/planckton_cpu_0.1.4.sif"
+singularity pull docker://cmelab/planckton_cpu:0.1.5
+export PLANCKTON_SIMG="/home/erjank_project/singularity_images/planckton_cpu_0.1.5.sif"
 ```
 
 The basic workflow is something like this:
@@ -57,7 +57,7 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
 When working on a cluster, we will be using singularity.
 We assume the image is located in `~/planckton/`.
 
-So, `cd ~/planckton` then `singularity pull docker://cmelab/planckton_cpu:0.1.4`
+So, `cd ~/planckton` then `singularity pull docker://cmelab/planckton_cpu:0.1.5`
 
 Then the workflow is the same as local, except now the jobs will be submitted to the scheduler 
 
