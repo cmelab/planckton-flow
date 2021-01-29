@@ -5,6 +5,7 @@ status, execute operations and submit them to a cluster. See also:
 
     $ python src/project.py --help
 """
+import flow
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import BridgesEnvironment, CometEnvironment
@@ -84,8 +85,13 @@ def get_paths(key):
     except KeyError:
         return key
 
+def on_container(func):
+        return flow.directives(
+                executable='singularity exec $PLANCKTON_SIMG python'
+                )(func)
 
-@directives(executable="python -u")
+
+@on_container
 @directives(ngpu=1)
 @MyProject.operation
 @MyProject.post(sampled)
