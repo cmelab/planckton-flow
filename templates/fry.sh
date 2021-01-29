@@ -20,4 +20,3 @@
 #SBATCH --ntasks={{ np_global }}
 {% endblock %}
 {% endblock %}
-{% set cmd_prefix = "singularity exec --nv --bind /home/:/home/ $PLANCKTON_SIMG " %}
