@@ -4,6 +4,7 @@ channels:
 dependencies:
   - gsd=2.2.0
   - python=3.7
+  - pip=20.2
   - signac=1.6.0
   - signac-flow=0.11.0
   - pip:
