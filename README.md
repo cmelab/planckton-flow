@@ -8,52 +8,67 @@ PlanckTon-flow is a lightweight dataspace manager that leverages the [Signac](ht
 PlanckTon-flow uses the [conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) package manager. Before installing PlanckTon-flow, please install Miniconda.
 
 1. First download PlanckTon-flow:
-```
-git clone git@github.com:cmelab/planckton-flow.git
-cd planckton-flow
-```
 
-1. Then install its requirements:
-```
-conda env create -f environment.yml
-conda activate planckton-flow
-```
-PlanckTon-flow is not a python package, so it does not need to be installed.
+    ```bash
+    git clone git@github.com:cmelab/planckton-flow.git
+    cd planckton-flow
+    ```
 
-1. In order to use PlanckTon-flow, the PlanckTon container must be pulled to your machine and its location assigned the environment variable `$PLANCKTON_SIMG`.
-The following example shows the container pulled to a directory called `~/images`:
-```
-cd ~/images
-singularity pull docker://cmelab/planckton_cpu:0.1.5
-export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif
-```
-Or you can run this command to add the image location to your bashrc file so you never have to run this step again
-```
-echo "export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif" >> ~/.bashrc
-```
+2. Then install its requirements:
 
-And that's it--you are ready to run simulations.
+    ```bash
+    conda env create -f environment.yml
+    conda activate planckton-flow
+    ```
+
+    PlanckTon-flow is not a python package, so it does not need to be installed.
+
+3. In order to use PlanckTon-flow, the PlanckTon container must be pulled to your machine and its location assigned the environment variable `$PLANCKTON_SIMG`. 
+    
+    The following example shows the container pulled to a directory called `~/images`:
+
+    ```bash
+    cd ~/images
+    singularity pull docker://cmelab/planckton_cpu:0.1.5
+    export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif
+    ```
+
+    Or you can run this command to add the image location to your bashrc file so you never have to run this step again
+
+    ```
+    echo "export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif" >> ~/.bashrc
+    ```
+
+And that's it--you are ready to run simulations!
 
 ### Run
 
 After making sure singularity is available (`module load singularity`), your conda environment is active (`conda activate planckton-flow`), and the `PLANCKTON_SIMG` variable is set, the basic workflow is something like this:
 
 1. Edit the init file to define state point space
-```
-vim src/init.py
-```
+
+    ```
+    vim src/init.py
+    ```
+    
 2. Run the init script to create a workspace
-```
-python src/init.py
-```
+
+    ```
+    python src/init.py
+    ```
+    
 3. Check to make sure your jobs look correct
-```
-python src/project.py submit --pretend 
-```
+
+    ```
+    python src/project.py submit --pretend 
+    ```
+
 4. Submit the project script to run your simulations
-```
-python src/project.py submit
-```
+
+    ```
+    python src/project.py submit
+    ```
+    
 `src/project.py` contains all of the job operations.
 
 ## Cluster support
