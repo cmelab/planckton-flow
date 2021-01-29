@@ -35,7 +35,7 @@ PlanckTon-flow uses the [conda](https://conda.io/projects/conda/en/latest/user-g
 
     Or you can run this command to add the image location to your bashrc file so you never have to run this step again
 
-    ```
+    ```bash
     echo "export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif" >> ~/.bashrc
     ```
 
@@ -47,29 +47,29 @@ After making sure singularity is available (`module load singularity`), your con
 
 1. Edit the init file to define state point space
 
-    ```
+    ```bash
     vim src/init.py
     ```
     
 2. Run the init script to create a workspace
 
-    ```
+    ```bash
     python src/init.py
     ```
     
 3. Check to make sure your jobs look correct
 
-    ```
+    ```bash
     python src/project.py submit --pretend 
     ```
 
 4. Submit the project script to run your simulations
 
-    ```
+    ```bash
     python src/project.py submit
     ```
     
-`src/project.py` contains all of the job operations.
+    `src/project.py` contains all of the job operations.
 
 ## Cluster support
 
