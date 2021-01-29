@@ -27,12 +27,16 @@ cd ~/images
 singularity pull docker://cmelab/planckton_cpu:0.1.5
 export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif
 ```
+Or you can run this command to add the image location to your bashrc file so you never have to run this step again
+```
+echo "export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif" >> ~/.bashrc
+```
 
 And that's it--you are ready to run simulations.
 
 ### Run
 
-The basic workflow is something like this:
+After making sure singularity is available (`module load singularity`), your conda environment is active (`conda activate planckton-flow`), and the `PLANCKTON_SIMG` variable is set, the basic workflow is something like this:
 
 1. Edit the init file to define state point space
 ```
