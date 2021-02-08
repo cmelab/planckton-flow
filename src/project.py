@@ -38,7 +38,7 @@ class CometCustom(CometEnvironment):
 
 
 class Fry(DefaultSlurmEnvironment):
-    hostname_pattern = "fry"
+    hostname_pattern = "fry.boisestate.edu"
     template = "fry.sh"
 
     @classmethod
