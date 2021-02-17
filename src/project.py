@@ -87,7 +87,7 @@ def get_paths(key):
 
 def on_container(func):
         return flow.directives(
-                executable='singularity exec $PLANCKTON_SIMG python'
+                executable='singularity exec --nv $PLANCKTON_SIMG python'
                 )(func)
 
 

@@ -58,7 +58,7 @@ parameters = OrderedDict({
     "dt": [0.0001],
     # Whether to remove hydrogen atoms
     "remove_hydrogens": [False],  # True or False
-    "mode": ["cpu"]  # "cpu" or "gpu"
+    "mode": ["gpu"]  # "cpu" or "gpu"
 })
 
 
