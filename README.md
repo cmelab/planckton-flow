@@ -43,15 +43,16 @@ And that's it--you are ready to run simulations!
 
 ### Run
 
-0. Pre-run steps: 
-    1. Make sure singularity is available 
+0. Pre-run steps: (These commands can be added to your .bashrc to save time.)
+
+    1. Make sure singularity is available,
     
         Fry:
         ```bash
         module load singularity
         ```
         Bridges2: singularity is loaded by default
-    2. CUDA libraries are on your path 
+    2. CUDA libraries are on your path,
     
         Fry:
         ```bash
@@ -61,11 +62,13 @@ And that's it--you are ready to run simulations!
         ```bash
         module load cuda/10
         ```
-    3. The conda environment is active 
+    3. The conda environment is active, 
         ```bash
         conda activate planckton-flow
         ```
-    4. The `PLANCKTON_SIMG` variable is set, the basic workflow is something like this:
+    4. And the `PLANCKTON_SIMG` variable is set, 
+
+the basic workflow is something like this:
 
 1. Edit the init file to define state point space
 
