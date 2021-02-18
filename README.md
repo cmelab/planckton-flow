@@ -45,12 +45,14 @@ And that's it--you are ready to run simulations!
 
 0. Pre-run steps: 
     1. Make sure singularity is available 
+    
         Fry:
         ```bash
         module load singularity
         ```
         Bridges2: singularity is loaded by default
     2. CUDA libraries are on your path 
+    
         Fry:
         ```bash
         module load cuda
