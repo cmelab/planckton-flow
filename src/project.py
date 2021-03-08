@@ -25,6 +25,23 @@ class BridgesCustom(BridgesEnvironment):
             help="Specify the partition to submit to.",
         )
 
+try:
+    from flow.environments.xsede import Bridges2Environment
+
+    class Bridges2Custom(Bridges2Environment):
+        template = "bridges2custom.sh"
+    
+        @classmethod
+        def add_args(cls, parser):
+            super(Bridges2Environment, cls).add_args(parser)
+            parser.add_argument(
+                "--partition",
+                default="GPU-shared",
+                help="Specify the partition to submit to.",
+            )
+except ImportError:
+    pass
+
 
 class CometCustom(CometEnvironment):
     @classmethod
@@ -38,7 +55,7 @@ class CometCustom(CometEnvironment):
 
 
 class Fry(DefaultSlurmEnvironment):
-    hostname_pattern = "fry"
+    hostname_pattern = "fry.boisestate.edu"
     template = "fry.sh"
 
     @classmethod
@@ -87,7 +104,7 @@ def get_paths(key):
 
 def on_container(func):
         return flow.directives(
-                executable='singularity exec $PLANCKTON_SIMG python'
+                executable='singularity exec --nv $PLANCKTON_SIMG python'
                 )(func)
 
 

@@ -29,21 +29,46 @@ PlanckTon-flow uses the [conda](https://conda.io/projects/conda/en/latest/user-g
 
     ```bash
     cd ~/images
-    singularity pull docker://cmelab/planckton_cpu:0.1.5
-    export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif
+    singularity pull docker://cmelab/planckton_gpu:latest
+    export PLANCKTON_SIMG=$(pwd)/planckton_gpu_latest.sif
     ```
 
-    Or you can run this command to add the image location to your bashrc file so you never have to run this step again
+    Or you can run this command (while still in the directory where you pulled the image) to add the image location to your bashrc file so you never have to run this step again
 
     ```bash
-    echo "export PLANCKTON_SIMG=$(pwd)/planckton_cpu_0.1.5.sif" >> ~/.bashrc
+    echo "export PLANCKTON_SIMG=$(pwd)/planckton_gpu_latest.sif" >> ~/.bashrc
     ```
 
 And that's it--you are ready to run simulations!
 
 ### Run
 
-After making sure singularity is available (`module load singularity`), your conda environment is active (`conda activate planckton-flow`), and the `PLANCKTON_SIMG` variable is set, the basic workflow is something like this:
+0. Pre-run steps: (These commands can be added to your .bashrc to save time.)
+
+    1. Make sure singularity is available,
+    
+        Fry:
+        ```bash
+        module load singularity
+        ```
+        Bridges2: singularity is loaded by default
+    2. CUDA libraries are on your path,
+    
+        Fry:
+        ```bash
+        module load cuda
+        ```
+        Bridges2:
+        ```bash
+        module load cuda/10
+        ```
+    3. The conda environment is active, 
+        ```bash
+        conda activate planckton-flow
+        ```
+    4. And the `PLANCKTON_SIMG` variable is set, 
+
+the basic workflow is something like this:
 
 1. Edit the init file to define state point space
 
