@@ -122,6 +122,13 @@ def sample(job):
             system = packer.pack()
         print(f"Target length should be {packer.L:0.3f}")
 
+        if job.isfile("restart.gsd"):
+            restart = job.fn("restart.gsd")
+            target_length = None
+        else:
+            restart = None
+            target_length = packer.L
+
         my_sim = Simulation(
                 system,
                 kT=job.sp.kT_reduced,
@@ -133,7 +140,8 @@ def sample(job):
                 tau=job.sp.tau,
                 dt=job.sp.dt,
                 mode=job.sp.mode,
-                target_length=packer.L,
+                target_length=target_length,
+                restart=restart
         )
 
 
