@@ -8,22 +8,12 @@ status, execute operations and submit them to a cluster. See also:
 import flow
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
-from flow.environments.xsede import BridgesEnvironment, CometEnvironment
+from flow.environments.xsede import CometEnvironment
 
 
 class MyProject(FlowProject):
     pass
 
-
-class BridgesCustom(BridgesEnvironment):
-    @classmethod
-    def add_args(cls, parser):
-        super(BridgesEnvironment, cls).add_args(parser)
-        parser.add_argument(
-            "--partition",
-            default="GPU-shared",
-            help="Specify the partition to submit to.",
-        )
 
 try:
     from flow.environments.xsede import Bridges2Environment
