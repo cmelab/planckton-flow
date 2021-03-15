@@ -8,29 +8,24 @@ status, execute operations and submit them to a cluster. See also:
 import flow
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
-from flow.environments.xsede import CometEnvironment
+from flow.environments.xsede import Bridges2Environment, CometEnvironment
 
 
 class MyProject(FlowProject):
     pass
 
 
-try:
-    from flow.environments.xsede import Bridges2Environment
+class Bridges2Custom(Bridges2Environment):
+    template = "bridges2custom.sh"
 
-    class Bridges2Custom(Bridges2Environment):
-        template = "bridges2custom.sh"
-    
-        @classmethod
-        def add_args(cls, parser):
-            super(Bridges2Environment, cls).add_args(parser)
-            parser.add_argument(
-                "--partition",
-                default="GPU-shared",
-                help="Specify the partition to submit to.",
-            )
-except ImportError:
-    pass
+    @classmethod
+    def add_args(cls, parser):
+        super(Bridges2Environment, cls).add_args(parser)
+        parser.add_argument(
+            "--partition",
+            default="GPU-shared",
+            help="Specify the partition to submit to.",
+        )
 
 
 class CometCustom(CometEnvironment):
@@ -129,6 +124,13 @@ def sample(job):
             system = packer.pack()
         print(f"Target length should be {packer.L:0.3f}")
 
+        if job.isfile("restart.gsd"):
+            restart = job.fn("restart.gsd")
+            target_length = None
+        else:
+            restart = None
+            target_length = packer.L
+
         my_sim = Simulation(
                 system,
                 kT=job.sp.kT_reduced,
@@ -140,7 +142,8 @@ def sample(job):
                 tau=job.sp.tau,
                 dt=job.sp.dt,
                 mode=job.sp.mode,
-                target_length=packer.L,
+                target_length=target_length,
+                restart=restart
         )
 
 
