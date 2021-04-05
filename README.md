@@ -42,33 +42,37 @@ PlanckTon-flow uses the [conda](https://conda.io/projects/conda/en/latest/user-g
 And that's it--you are ready to run simulations!
 
 ### Run
+<details>
+    <summary>Pre-run steps (Click to expand):</summary>
 
-0. Pre-run steps: (These commands can be added to your .bashrc to save time.)
-
-    1. Make sure singularity is available,
+(These commands can be added to your .bashrc to save time.)
+1. Make sure singularity is available,
     
-        Fry:
-        ```bash
-        module load singularity
-        ```
-        Bridges2: singularity is loaded by default
-    2. CUDA libraries are on your path,
-    
-        Fry:
-        ```bash
-        module load cuda
-        ```
-        Bridges2:
-        ```bash
-        module load cuda/10
-        ```
-    3. The conda environment is active, 
-        ```bash
-        conda activate planckton-flow
-        ```
-    4. And the `PLANCKTON_SIMG` variable is set, 
+    Fry:
+    ```bash
+    module load singularity
+    ```
+    Bridges2: singularity is loaded by default
+        
+2. CUDA libraries are on your path,
 
-the basic workflow is something like this:
+    Fry:
+    ```bash
+    module load cuda
+    ```
+    Bridges2:
+    ```bash
+    module load cuda/10
+    ```
+3. The conda environment is active, 
+    ```bash
+    conda activate planckton-flow
+    ```
+4. And the `PLANCKTON_SIMG` variable is set, 
+
+</details>
+
+The basic workflow is something like this:
 
 1. Edit the init file to define state point space
 
