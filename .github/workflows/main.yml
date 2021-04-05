@@ -3,8 +3,14 @@ name: CI
 on:
   push:
     branches: [ master ]
+    paths:
+      - "src/*"
+      - "test_local.py"
   pull_request:
     branches: [ master ]
+    paths:
+      - "src/*"
+      - "test_local.py"
 
 jobs:
   build:
