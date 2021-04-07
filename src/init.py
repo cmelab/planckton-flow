@@ -9,6 +9,8 @@ from itertools import product
 import signac
 
 
+project_name = "my_project"
+
 # Parameters used for generating the morphology
 parameters = OrderedDict({
     # input can be the path to a molecule file or a SMILES string
@@ -67,7 +69,7 @@ def get_parameters(parameters):
 
 
 def main(parameters):
-    project = signac.init_project("debug")
+    project = signac.init_project(project_name)
     param_names, param_combinations = get_parameters(parameters)
     # Create the generate jobs
     for params in param_combinations:
@@ -76,6 +78,7 @@ def main(parameters):
         parent_job.init()
         parent_job.doc.setdefault("steps", parent_statepoint["n_steps"])
     project.write_statepoints()
+    print(f"Initialized. ({len(param_combinations)} total jobs)")
 
 
 if __name__ == "__main__":
