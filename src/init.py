@@ -51,11 +51,11 @@ parameters = OrderedDict({
 
     # Simulation parameters
     # Thermostat coupling
-    "tau": [3],
+    "tau": [1],
     # Number of steps to shrink the box
     "shrink_steps": [1e3],
     # Number of steps to run final simulation
-    "n_steps": [1e3],
+    "n_steps": [1e7],
     # Timestep size
     "dt": [0.0001],
     # Whether to remove hydrogen atoms
