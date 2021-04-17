@@ -40,7 +40,7 @@ parameters = OrderedDict({
     # Density must be specified as a pair containing (value, unit)
     "density": [(1.0, "g/cm**3")],
     # Energy scaling "solvent" parameter
-    "e_factor": [0.5],
+    "e_factor": [1.0],
 
     # Force fields are specified as keys to the FORCE_FIELD dictionary in
     # planckton/force_fields/__init__.py
