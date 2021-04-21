@@ -81,9 +81,9 @@ def sampled(job):
 
 
 def get_paths(key):
-    from planckton.compounds import COMPOUND_FILE
+    from planckton.compounds import COMPOUND
     try:
-        return COMPOUND_FILE[key]
+        return COMPOUND[key]
     except KeyError:
         return key
 
@@ -105,7 +105,7 @@ def sample(job):
     from planckton.sim import Simulation
     from planckton.init import Compound, Pack
     from planckton.utils import units
-    from planckton.force_fields import FORCE_FIELD
+    from planckton.forcefields import FORCEFIELD
 
 
     with job:
@@ -115,7 +115,7 @@ def sample(job):
             compound = [Compound(i) for i in inputs]
             packer = Pack(
                 compound,
-                ff=FORCE_FIELD[job.sp.forcefield],
+                ff=FORCEFIELD[job.sp.forcefield],
                 n_compounds=job.sp.n_compounds,
                 density=units.tuple_to_quantity(job.sp.density),
                 remove_hydrogen_atoms=job.sp.remove_hydrogens,

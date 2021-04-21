@@ -6,13 +6,13 @@ from src import init, project
 
 
 test_params = OrderedDict({
-    "input": [["PCBM"]],
+    "input": [["PCBM-gaff"]],
     "n_compounds": [5],
     "density": [(1.0, "g/cm**3")],
     "e_factor": [0.5],
-    "forcefield": ["opv_gaff"],
+    "forcefield": ["gaff-custom"],
     "kT_reduced": [0.5],
-    "tau": [3],
+    "tau": [1],
     "shrink_steps": [1e3],
     "n_steps": [1e3],
     "dt": [0.0001],
