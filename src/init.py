@@ -14,22 +14,24 @@ project_name = "my_project"
 # Parameters used for generating the morphology
 parameters = OrderedDict({
     # input can be the path to a molecule file or a SMILES string
-    # or a key to the COMPOUND_FILE dictionary
+    # or a key to the COMPOUND dictionary in PlanckTon (shown below)
+    # The compounds ending with "-gaff" are designed to be used with the
+    # "gaff-custom" forcefield; if using a smiles string, use just "gaff".
     # Mixtures can be specified like so
-    # "input" = [["PCBM", "P3HT_16"]]
+    # "input" = [["PCBM-gaff", "P3HT-16-gaff"]]
     # note the additional brackets
     "input": [
-        #["CZTPTZ8FITIC"],
-        #["CZTPTZITIC"],
-        ["PCBM"],
-        #["P3HT_16"],
-        #["ITIC"],
-        #["ITIC-Th"],
-        #["IEICO"],
-        #["IDT-2BR"],
-        #["EH-IDTBR"],
-        #["TruxTP6FITIC"],
-        #["TruxTPITIC"],
+        #["CZTPTZ8FITIC-gaff"],
+        #["CZTPTZITIC-gaff"],
+        ["PCBM-gaff"],
+        #["P3HT-16-gaff"],
+        #["ITIC-gaff"],
+        #["ITIC-Th-gaff"],
+        #["IEICO-gaff"],
+        #["IDT-2BR-gaff"],
+        #["EH-IDTBR-gaff"],
+        #["TruxTP6FITIC-gaff"],
+        #["TruxTPITIC-gaff"],
         ],
 
     # If a mixture is used, the number of each compound in the mixture
@@ -42,9 +44,12 @@ parameters = OrderedDict({
     # Energy scaling "solvent" parameter
     "e_factor": [1.0],
 
-    # Force fields are specified as keys to the FORCE_FIELD dictionary in
-    # planckton/force_fields/__init__.py
-    "forcefield": ["opv_gaff"],
+    # Force fields are specified as keys to the FORCEFIELD dictionary in
+    # planckton/forcefields/__init__.py
+    "forcefield": [
+        "gaff-custom",
+        #"gaff",
+        ],
 
     # Reduced temperatures specified in simulation units
     "kT_reduced": [1.0],
