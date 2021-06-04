@@ -10,6 +10,7 @@ from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import Bridges2Environment, CometEnvironment
 
+
 class MyProject(FlowProject):
     pass
 
@@ -92,17 +93,6 @@ def on_container(func):
                 )(func)
 
 
-
-@MyProject.label
-def rdfed(job):
-    return job.isfile("rdf.txt")
-
-
-def on_pflow(func):
-    return flow.directives(
-            executable='$HOME/.conda/envs/planckton-flow/bin/python')(func)
-
-
 @on_container
 @directives(ngpu=1)
 @MyProject.operation
@@ -177,22 +167,6 @@ def sample(job):
         job.doc["ref_distance"] = units.quantity_to_tuple(ref_distance)
         job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
 
-@directives(ngpu=1)
-@on_pflow
-@MyProject.operation
-@MyProject.post(rdfed)
-@MyProject.pre(sampled)
-def post_proc(job):
-    from cmeutils.structure import gsd_rdf
-    import numpy as np
-    import os
-
-    gsdfile= job.fn('trajectory.gsd')
-    rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
-    x = rdf.bin_centers
-    y = rdf.rdf*norm
-    save_path= os.path.join(job.ws,"rdf.txt")
-    np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
 
 if __name__ == "__main__":
     MyProject().main()
