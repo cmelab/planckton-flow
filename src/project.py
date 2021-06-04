@@ -100,7 +100,7 @@ def rdfed(job):
 
 def on_pflow(func):
     return flow.directives(
-            executable='$HOME/.conda/envs/planckton-flow/bin/python')(func)
+            executable='/jet/home/whiteg/.conda/envs/planckton-flow/bin/python')(func)
 
 
 @on_container
@@ -186,6 +186,8 @@ def post_proc(job):
     from cmeutils.structure import gsd_rdf
     import numpy as np
     import os
+    import matplotlib
+    import matplotlib.pyplot as plt
 
     gsdfile= job.fn('trajectory.gsd')
     rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
@@ -193,6 +195,11 @@ def post_proc(job):
     y = rdf.rdf*norm
     save_path= os.path.join(job.ws,"rdf.txt")
     np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
+    plt.xlabel("r (A.U.)", fontsize=14)
+    plt.ylabel("g(r)", fontsize=14)
+    plt.plot(x, y)
+    save_plot= os.path.join(job.ws,"rdf.png")
+    plt.savefig(save_plot)
 
 if __name__ == "__main__":
     MyProject().main()
