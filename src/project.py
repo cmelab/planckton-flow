@@ -101,7 +101,7 @@ def get_paths(key):
         raise FileNotFoundError(
             "Please provide either a path to a file (the absolute path or the "
             "relative path in the planckton-flow root directory) or a key to "
-            f"the COMOUND dictionary: {COMPOUND.keys()}\n"
+            f"the COMPOUND dictionary: {COMPOUND.keys()}\n"
             f"You provided: {key}"
         )
 
