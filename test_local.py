@@ -25,8 +25,7 @@ def test():
     init.main(test_params)
     workspace = signac.get_project()
     for job in workspace:
-        pass
-    project.sample(job)
+        project.sample(job)
 
 
 if __name__ == "__main__":

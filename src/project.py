@@ -9,6 +9,7 @@ import flow
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import Bridges2Environment, CometEnvironment
+from os import path
 
 
 class MyProject(FlowProject):
@@ -80,12 +81,28 @@ def sampled(job):
     return current_step(job) >= job.doc.steps
 
 
-def get_paths(key):
+def get_paths(key, job):
     from planckton.compounds import COMPOUND
     try:
         return COMPOUND[key]
     except KeyError:
-        return key
+        # job.ws will be the path to the job e.g.,
+        # path/to/planckton-flow/workspace/jobid
+        # this is the planckton root dir e.g.,
+        # path/to/planckton-flow
+        file_path = path.abspath(path.join(job.ws, "..", "..", key))
+        if path.isfile(key):
+            print(f"Using {key} for structure")
+            return key
+        elif path.isfile(file_path):
+            print(f"Using {file_path} for structure")
+            return file_path
+        raise FileNotFoundError(
+            "Please provide either a path to a file (the absolute path or the "
+            "relative path in the planckton-flow root directory) or a key to "
+            f"the COMPOUND dictionary: {COMPOUND.keys()}\n"
+            f"You provided: {key}"
+        )
 
 def on_container(func):
         return flow.directives(
@@ -109,7 +126,7 @@ def sample(job):
 
 
     with job:
-        inputs = [get_paths(i) for i in job.sp.input]
+        inputs = [get_paths(i,job) for i in job.sp.input]
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             compound = [Compound(i) for i in inputs]
