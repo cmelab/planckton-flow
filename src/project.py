@@ -81,17 +81,16 @@ def sampled(job):
     return current_step(job) >= job.doc.steps
 
 
-def get_paths(key):
+def get_paths(key, job):
     from planckton.compounds import COMPOUND
     try:
         return COMPOUND[key]
     except KeyError:
-        # this will be the path to the job e.g.,
+        # job.ws will be the path to the job e.g.,
         # path/to/planckton-flow/workspace/jobid
-        dir_path = path.dirname(path.realpath(__file__))
         # this is the planckton root dir e.g.,
         # path/to/planckton-flow
-        file_path = path.abspath(path.join(dir_path, "..", "..", "..", key))
+        file_path = path.abspath(path.join(job.ws, "..", "..", key))
         if path.isfile(key):
             print(f"Using {key} for structure")
             return key
@@ -127,7 +126,7 @@ def sample(job):
 
 
     with job:
-        inputs = [get_paths(i) for i in job.sp.input]
+        inputs = [get_paths(i,job) for i in job.sp.input]
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             compound = [Compound(i) for i in inputs]
