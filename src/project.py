@@ -51,6 +51,10 @@ class Fry(DefaultSlurmEnvironment):
             default="batch",
             help="Specify the partition to submit to."
         )
+        parser.add_argument(
+            "--nodelist",
+            help="Specify the node to submit to."
+        )
 
 
 class Kestrel(DefaultSlurmEnvironment):
@@ -183,6 +187,8 @@ def sample(job):
         job.doc["ref_mass"] = units.quantity_to_tuple(ref_mass)
         job.doc["ref_distance"] = units.quantity_to_tuple(ref_distance)
         job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
+
+        #if job.isfile
 
 
 if __name__ == "__main__":
