@@ -188,6 +188,13 @@ def post_proc(job):
     import os
     import matplotlib
     import matplotlib.pyplot as plt
+    import freud
+    import gsd
+    import hoomd
+    import gsd.pygsd
+    import gsd.hoomd
+    import signac
+    hoomd.context.initialize("")
 
     gsdfile= job.fn('trajectory.gsd')
     rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
@@ -200,6 +207,19 @@ def post_proc(job):
     plt.plot(x, y)
     save_plot= os.path.join(job.ws,"rdf.png")
     plt.savefig(save_plot)
+
+    f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
+    t = gsd.hoomd.HOOMDTrajectory(f)
+    last_frame = [-1]
+    frame = len(t)
+    snap = hoomd.data.gsd_snapshot(gsdfile, frame-1)
+    points = snap.particles.position
+    box = freud.Box.from_box(snap.box)
+    dp = freud.diffraction.DiffractionPattern(grid_size=1024,
+                                  output_size=1024)
+    dp.compute((box, points), view_orientation=np.array([1,0,0,0]))
+    dp.plot()
+    plt.savefig(os.path.join(job.ws,"dp.png"))
 
 if __name__ == "__main__":
     MyProject().main()
