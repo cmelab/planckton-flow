@@ -190,14 +190,33 @@ def sample(job):
         job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
 
         outfiles = glob.glob(f"{job.ws}/job*.o")
-        for ofile in outfiles:
-            with open(ofile) as f:
-                lines = f.readlines()
-                # first value is TPS for shrink, second value is for sim
-                tpsline = [line for line in lines if "Average TPS" in line][-1]
-                tps = tpsline.strip("Average TPS:").strip()
+        if outfiles:
+            tps,time = get_tps_time(outfiles)
+            job.doc["average_TPS"] = tps
+            job.doc["total_time"] = time
 
-        job.doc["average_TPS"] = tps
+
+def get_tps_time(outfiles):
+    import numpy as np
+
+    times = []
+    for ofile in outfiles:
+        with open(ofile) as f:
+            lines = f.readlines()
+            # first value is TPS for shrink, second value is for sim
+            tpsline = [l for l in lines if "Average TPS" in l][-1]
+            tps = tpsline.strip("Average TPS:").strip()
+
+            t_lines = [l for l in lines if "Time" in l]
+            h,m,s = t_lines[-1].split(" ")[1].split(":")
+            times.append(int(h)*3600 + int(m)*60 + int(s))
+    # total time in seconds
+    total_time = np.sum(times)
+    hh = total_time // 3600
+    mm = (total_time - hh*3600) // 60
+    ss = total_time % 60
+    return tps, f"{hh:02d}:{mm:02d}:{ss:02d}"
+
 
 
 if __name__ == "__main__":
