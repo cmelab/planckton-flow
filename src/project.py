@@ -119,6 +119,7 @@ def on_container(func):
 @MyProject.operation
 @MyProject.post(sampled)
 def sample(job):
+    import glob
     import warnings
 
     import unyt as u
@@ -188,7 +189,15 @@ def sample(job):
         job.doc["ref_distance"] = units.quantity_to_tuple(ref_distance)
         job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
 
-        #if job.isfile
+        outfiles = glob.glob(f"{job.ws}/job*.o")
+        for ofile in outfiles:
+            with open(ofile) as f:
+                lines = f.readlines()
+                # first value is TPS for shrink, second value is for sim
+                tpsline = [line for line in lines if "Average TPS" in line][-1]
+                tps = tpsline.strip("Average TPS:").strip()
+
+        job.doc["average_TPS"] = tps
 
 
 if __name__ == "__main__":
