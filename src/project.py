@@ -188,13 +188,6 @@ def post_proc(job):
     import os
     import matplotlib
     import matplotlib.pyplot as plt
-    import freud
-    import gsd
-    import hoomd
-    import gsd.pygsd
-    import gsd.hoomd
-    import signac
-    hoomd.context.initialize("")
     gsdfile= job.fn('trajectory.gsd')
     rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
     x = rdf.bin_centers
