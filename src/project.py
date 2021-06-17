@@ -190,9 +190,13 @@ def post_proc(job):
     import os
     import matplotlib
     import matplotlib.pyplot as plt
-    import gsd
-    import gsd.hoomd
     import freud
+    import gsd
+    import hoomd
+    import gsd.pygsd
+    import gsd.hoomd
+    import signac
+    hoomd.context.initialize("")
 
     gsdfile= job.fn('trajectory.gsd')
     rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
@@ -204,23 +208,19 @@ def post_proc(job):
     plt.ylabel("g(r)", fontsize=14)
     plt.plot(x, y)
     save_plot= os.path.join(job.ws,"rdf.png")
-    plt.savefig(save_plot) 
-    with gsd.hoomd.open(gsdfile) as f:
-        snap = f[-1]
-        points = snap.particles.position
-        box = freud.Box.from_box(snap.configuration.box)
-        dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
-        q_list= []
-        os.mkdir(os.path.join(job.ws,"diffraction_plots"))
-    for q in cmeutils.structure.get_quaternions():
-        plt.savefig(os.path.join(job.ws,"diffraction_plots/%s.png" % (q)))
-        q_list.append(q)
-        fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
-        qx,qy,qz,qw = q
-        dp.compute((box, points), view_orientation=q)
-        dp.plot(ax=ax)
-        ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
-    dp_path=os.path.join(job.ws,"dp.npy")
-    np.save(dp_path, q_list)
+    plt.savefig(save_plot)
+
+    f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
+    t = gsd.hoomd.HOOMDTrajectory(f)
+    last_frame = [-1]
+    frame = len(t)
+    snap = hoomd.data.gsd_snapshot(gsdfile, frame-1)
+    points = snap.particles.position
+    box = freud.Box.from_box(snap.box)
+    dp = freud.diffraction.DiffractionPattern(grid_size=1024,
+                                  output_size=1024)
+    dp.compute((box, points), view_orientation=np.array([1,0,0,0]))
+    dp.plot()
+    plt.savefig(os.path.join(job.ws,"dp.png"))
 if __name__ == "__main__":
     MyProject().main()
