@@ -10,7 +10,6 @@ from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import Bridges2Environment, CometEnvironment
 
-
 class MyProject(FlowProject):
     pass
 
@@ -93,6 +92,17 @@ def on_container(func):
                 )(func)
 
 
+
+@MyProject.label
+def rdfed(job):
+    return job.isfile("rdf.txt")
+
+
+def on_pflow(func):
+    return flow.directives(
+            executable='/jet/home/whiteg/.conda/envs/planckton-flow/bin/python')(func)
+
+
 @on_container
 @directives(ngpu=1)
 @MyProject.operation
@@ -167,6 +177,50 @@ def sample(job):
         job.doc["ref_distance"] = units.quantity_to_tuple(ref_distance)
         job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
 
+@directives(ngpu=1)
+@on_pflow
+@MyProject.operation
+@MyProject.post(rdfed)
+@MyProject.pre(sampled)
+def post_proc(job):
+    import cmeutils
+    from cmeutils.structure import gsd_rdf
+    from cmeutils.structure import get_quaternions
+    import numpy as np
+    import os
+    import matplotlib
+    import matplotlib.pyplot as plt
+    import gsd
+    import gsd.hoomd
+    import freud
 
+    gsdfile= job.fn('trajectory.gsd')
+    rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
+    x = rdf.bin_centers
+    y = rdf.rdf*norm
+    save_path= os.path.join(job.ws,"rdf.txt")
+    np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
+    plt.xlabel("r (A.U.)", fontsize=14)
+    plt.ylabel("g(r)", fontsize=14)
+    plt.plot(x, y)
+    save_plot= os.path.join(job.ws,"rdf.png")
+    plt.savefig(save_plot) 
+    with gsd.hoomd.open(gsdfile) as f:
+        snap = f[-1]
+        points = snap.particles.position
+        box = freud.Box.from_box(snap.configuration.box)
+        dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
+        q_list= []
+        os.mkdir(os.path.join(job.ws,"diffraction_plots"))
+    for q in cmeutils.structure.get_quaternions():
+        plt.savefig(os.path.join(job.ws,"diffraction_plots/%s.png" % (q)))
+        q_list.append(q)
+        fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
+        qx,qy,qz,qw = q
+        dp.compute((box, points), view_orientation=q)
+        dp.plot(ax=ax)
+        ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
+    dp_path=os.path.join(job.ws,"dp.npy")
+    np.save(dp_path, q_list)
 if __name__ == "__main__":
     MyProject().main()
