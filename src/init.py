@@ -38,8 +38,8 @@ parameters = {
     # "n_compounds" = [(100,100), (1000,500)]
     "n_compounds": [100],
 
-    # Density must be specified as a pair containing (value, unit)
-    "density": [(1.0, "g/cm**3")],
+    # Density specified as a string, like "value_unit" replacing "/" with "-"
+    "density": ["1.0_g-cm**3"],
     # Energy scaling "solvent" parameter
     "e_factor": [1.0],
 

@@ -109,9 +109,9 @@ def get_paths(key, job):
         )
 
 def on_container(func):
-        return flow.directives(
-                executable='singularity exec --nv $PLANCKTON_SIMG python'
-                )(func)
+    return flow.directives(
+        executable='singularity exec --nv $PLANCKTON_SIMG python'
+    )(func)
 
 
 @on_container
@@ -139,7 +139,7 @@ def sample(job):
                 compound,
                 ff=FORCEFIELD[job.sp.forcefield],
                 n_compounds=job.sp.n_compounds,
-                density=units.tuple_to_quantity(job.sp.density),
+                density=units.string_to_quantity(job.sp.density),
                 remove_hydrogen_atoms=job.sp.remove_hydrogens,
             )
 
@@ -154,18 +154,18 @@ def sample(job):
             target_length = packer.L
 
         my_sim = Simulation(
-                system,
-                kT=job.sp.kT_reduced,
-                gsd_write=max([int(job.sp.n_steps / 100), 1]),
-                log_write=max([int(job.sp.n_steps / 10000), 1]),
-                e_factor=job.sp.e_factor,
-                n_steps=job.sp.n_steps,
-                shrink_steps=job.sp.shrink_steps,
-                tau=job.sp.tau,
-                dt=job.sp.dt,
-                mode=job.sp.mode,
-                target_length=target_length,
-                restart=restart
+            system,
+            kT=job.sp.kT_reduced,
+            gsd_write=max([int(job.sp.n_steps / 100), 1]),
+            log_write=max([int(job.sp.n_steps / 10000), 1]),
+            e_factor=job.sp.e_factor,
+            n_steps=job.sp.n_steps,
+            shrink_steps=job.sp.shrink_steps,
+            tau=job.sp.tau,
+            dt=job.sp.dt,
+            mode=job.sp.mode,
+            target_length=target_length,
+            restart=restart
         )
 
 
@@ -175,19 +175,17 @@ def sample(job):
         ref_energy = my_sim.ref_values.energy * u.kcal / u.mol
         ref_mass = my_sim.ref_values.mass * u.amu
 
-        job.doc["T_SI"] =   units.quantity_to_tuple(
-                units.kelvin_from_reduced(job.sp.kT_reduced, ref_energy)
-                )
-        job.doc["real_timestep"] = units.quantity_to_tuple(
-                units.convert_to_real_time(
-                    job.sp.dt,
-                    ref_mass,
-                    ref_distance,
-                    ref_energy).to("femtosecond")
-                )
-        job.doc["ref_mass"] = units.quantity_to_tuple(ref_mass)
-        job.doc["ref_distance"] = units.quantity_to_tuple(ref_distance)
-        job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
+        job.doc["T_SI"] = units.quantity_to_string(
+            units.kelvin_from_reduced(job.sp.kT_reduced, ref_energy)
+            )
+        job.doc["real_timestep"] = units.quantity_to_string(
+            units.convert_to_real_time(
+                job.sp.dt, ref_mass, ref_distance, ref_energy
+            ).to("femtosecond")
+        )
+        job.doc["ref_mass"] = units.quantity_to_string(ref_mass)
+        job.doc["ref_distance"] = units.quantity_to_string(ref_distance)
+        job.doc["ref_energy"] = units.quantity_to_string(ref_energy)
 
         outfiles = glob.glob(f"{job.ws}/job*.o")
         if outfiles:
@@ -216,7 +214,6 @@ def get_tps_time(outfiles):
     mm = (total_time - hh*3600) // 60
     ss = total_time % 60
     return tps, f"{hh:02d}:{mm:02d}:{ss:02d}"
-
 
 
 if __name__ == "__main__":
