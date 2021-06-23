@@ -116,12 +116,11 @@ clean.sh is a shell script file that will remove the workspace folder, including
 
 in your command line. **THIS WILL DELETE ANY JOBS YOU HAVE RUN SO FAR! MAKE SURE YOU ARE IN THE CLONE OF PLANCKTON-FLOW THAT YOU WANT THE WORKSPACE REMOVED FROM!**
 </details>
-  <details>
-     - print_status.sh
-     print_status.sh is a shell script file that prints out the status of your recently submitted jobs and saves this information to a file called status.txt. To run this shell script:
+<details>
+     <summary>`print_status.sh` (Click to expand)</summary>
+print_status.sh is a shell script file that prints out the status of your recently submitted jobs and saves this information to a file called status.txt. To run this shell script:
 
-     ```bash
      bash print_status.sh
-     ```
 
-      in your command line.
+in your command line.
+</details>
