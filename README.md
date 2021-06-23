@@ -118,7 +118,7 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
 
      in your command line.**MAKE SURE YOU ARE IN THE CLONE OF PLANCKTON_FLOW THAT YOU WANT THE WORKSPACE REMOVED FROM.
   <details>
-     <summary>Print_status.sh (Click to expand):</summary>
+     - print_status.sh
      Print_status.sh is a shell script file that prints out the status of your recently submitted jobs. To run this shell script:
      ```bash
      bash print_status.sh
