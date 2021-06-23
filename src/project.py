@@ -99,9 +99,15 @@ def rdfed(job):
 
 
 def on_pflow(func):
-    return flow.directives(
-            executable='/jet/home/whiteg/.conda/envs/planckton-flow/bin/python')(func)
-
+    import socket
+    hostname = socket.gethostname()
+    if hostname.endswith('.bridges2.psc.edu'):
+        return flow.directives(
+                executable='$HOME/.conda/envs/planckton-flow/bin/python')(func)
+    elif hostname.endswith('fry.boisestate.edu'):
+        return flow.directives(        
+                executable='$HOME/miniconda3/envs/planckon-flow/bin/python')(func)
+            
 
 @on_container
 @directives(ngpu=1)
@@ -195,16 +201,20 @@ def post_proc(job):
     import freud
 
     gsdfile= job.fn('trajectory.gsd')
-    rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
+    A_name='c'
+    B_name='c'
+    rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=2)
     x = rdf.bin_centers
     y = rdf.rdf*norm
     save_path= os.path.join(job.ws,"rdf.txt")
     np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
+    plt.plot(x, y)
     plt.xlabel("r (A.U.)", fontsize=14)
     plt.ylabel("g(r)", fontsize=14)
-    plt.plot(x, y)
+    plt.title("%s mol %s and %s's at %s and %s kT" % (job.sp['n_compounds'], A_name, B_name, job.sp['density'], job.sp['kT_reduced']), fontsize=16)
     save_plot= os.path.join(job.ws,"rdf.png")
-    plt.savefig(save_plot) 
+    plt.savefig(save_plot)
+
     with gsd.hoomd.open(gsdfile) as f:
         snap = f[-1]
         points = snap.particles.position
@@ -222,5 +232,7 @@ def post_proc(job):
         ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
     dp_path=os.path.join(job.ws,"dp.npy")
     np.save(dp_path, q_list)
+
+
 if __name__ == "__main__":
     MyProject().main()
