@@ -120,7 +120,9 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
   <details>
      - print_status.sh
      print_status.sh is a shell script file that prints out the status of your recently submitted jobs and saves this information to a file called status.txt. To run this shell script:
+
      ```bash
      bash print_status.sh
-      ```
+     ```
+
       in your command line.
