@@ -37,7 +37,7 @@ parameters = OrderedDict({
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
     # "n_compounds" = [(100,100), (1000,500)]
-    "n_compounds": [100, 200],
+    "n_compounds": [5],
 
     # Density must be specified as a pair containing (value, unit)
     "density": [(0.75, "g/cm**3")],
@@ -52,7 +52,7 @@ parameters = OrderedDict({
         ],
 
     # Reduced temperatures specified in simulation units
-    "kT_reduced": [0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
+    "kT_reduced": [1.0],
 
     # Simulation parameters
     # Thermostat coupling
@@ -60,7 +60,7 @@ parameters = OrderedDict({
     # Number of steps to shrink the box
     "shrink_steps": [1e3],
     # Number of steps to run final simulation
-    "n_steps": [2e8],
+    "n_steps": [1e6],
     # Timestep size
     "dt": [0.0001],
     # Whether to remove hydrogen atoms
