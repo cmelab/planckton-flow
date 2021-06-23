@@ -116,7 +116,7 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
     bash clean.sh 
     ```
 
-     in your command line.**MAKE SURE YOU ARE IN THE CLONE OF PLANCKTON_FLOW THAT YOU WANT THE WORKSPACE REMOVED FROM.
+     in your command line. **THIS WILL DELETE ANY JOBS YOU HAVE RUN SO FAR! MAKE SURE YOU ARE IN THE CLONE OF PLANCKTON-FLOW THAT YOU WANT THE WORKSPACE REMOVED FROM!**
   <details>
      - print_status.sh
      Print_status.sh is a shell script file that prints out the status of your recently submitted jobs. To run this shell script:
