@@ -107,7 +107,8 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
 * Fry
 * Kestrel
 
-### .sh file instructions
+<details>
+     <summary>## Included shell scripts (Click to expand)</summary>
 <details>
      <summary>Clean.sh (Click to expand):</summary>
      Clean.sh is a shell script file that will remove the workspace folder, including the files inside of it, within the present planckton-flow clone you are using. To run this shell script:
