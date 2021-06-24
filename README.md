@@ -29,7 +29,7 @@ PlanckTon-flow uses the [conda](https://conda.io/projects/conda/en/latest/user-g
 
     ```bash
     cd ~/images
-    singularity pull docker://cmelab/planckton_gpu_v0.4.0.sif
+    singularity pull docker://cmelab/planckton_gpu:v0.4.0.sif
     export PLANCKTON_SIMG=$(pwd)/planckton_gpu_v0.4.0.sif
     ```
 
