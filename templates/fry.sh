@@ -6,6 +6,9 @@
 {% if partition %}
 #SBATCH --partition={{ partition }}
 {% endif %}
+{% if nodelist %}
+#SBATCH --nodelist={{ nodelist }}
+{% endif %}
 {% if walltime %}
 #SBATCH -t {{ 48|format_timedelta }}
 {% endif %}
