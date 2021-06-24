@@ -125,7 +125,7 @@ def on_pflow(func):
     if hostname.endswith('.bridges2.psc.edu'):
         return flow.directives(
                 executable='$HOME/.conda/envs/planckton-flow/bin/python')(func)
-    elif hostname.endswith('fry.boisestate.edu'):
+    else:
         return flow.directives(        
                 executable='$HOME/miniconda3/envs/planckon-flow/bin/python')(func)
             
