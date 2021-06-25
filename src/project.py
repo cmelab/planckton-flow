@@ -120,15 +120,9 @@ def rdfed(job):
 
 
 def on_pflow(func):
-    import socket
-    hostname = socket.gethostname()
-    if hostname.endswith('.bridges2.psc.edu'):
-        return flow.directives(
-                executable='$HOME/.conda/envs/planckton-flow/bin/python')(func)
-    else:
-        return flow.directives(        
-                executable='$HOME/miniconda3/envs/planckon-flow/bin/python')(func)
-            
+    import sys                                            
+    pypath = sys.executable                                                             
+    return flow.directives(executable=f'{pypath}')(func)  
 
 @on_container
 @directives(ngpu=1)
