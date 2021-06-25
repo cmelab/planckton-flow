@@ -247,7 +247,7 @@ def post_proc(job):
     gsdfile= job.fn('trajectory.gsd')
     A_name='c'
     B_name='c'
-    rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=2)
+    rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
     x = rdf.bin_centers
     y = rdf.rdf*norm
     save_path= os.path.join(job.ws,"rdf.txt")
