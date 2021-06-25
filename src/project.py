@@ -9,6 +9,7 @@ import flow
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import Bridges2Environment, CometEnvironment
+from os import path
 
 class MyProject(FlowProject):
     pass
@@ -49,6 +50,10 @@ class Fry(DefaultSlurmEnvironment):
             default="batch",
             help="Specify the partition to submit to."
         )
+        parser.add_argument(
+            "--nodelist",
+            help="Specify the node to submit to."
+        )
 
 
 class Kestrel(DefaultSlurmEnvironment):
@@ -79,12 +84,28 @@ def sampled(job):
     return current_step(job) >= job.doc.steps
 
 
-def get_paths(key):
+def get_paths(key, job):
     from planckton.compounds import COMPOUND
     try:
         return COMPOUND[key]
     except KeyError:
-        return key
+        # job.ws will be the path to the job e.g.,
+        # path/to/planckton-flow/workspace/jobid
+        # this is the planckton root dir e.g.,
+        # path/to/planckton-flow
+        file_path = path.abspath(path.join(job.ws, "..", "..", key))
+        if path.isfile(key):
+            print(f"Using {key} for structure")
+            return key
+        elif path.isfile(file_path):
+            print(f"Using {file_path} for structure")
+            return file_path
+        raise FileNotFoundError(
+            "Please provide either a path to a file (the absolute path or the "
+            "relative path in the planckton-flow root directory) or a key to "
+            f"the COMPOUND dictionary: {COMPOUND.keys()}\n"
+            f"You provided: {key}"
+        )
 
 def on_container(func):
         return flow.directives(
@@ -99,20 +120,18 @@ def rdfed(job):
 
 
 def on_pflow(func):
-    import socket
-    hostname = socket.gethostname()
-    if hostname == "fry.boisestate.edu":
-        return flow.directives(
-            executable='$HOME/miniconda3/envs/planckton-flow/bin/python')(func)
-    elif hostname.endswith(".bridges2.psc.edu"):
-        return flow.directives(
-            executable='$HOME/.conda/envs/planckton-flow/bin/python')(func)
+    import sys                                            
+                                                          
+    pypath = sys.executable                                                                     
+    return flow.directives(executable=f'{pypath}')(func)  
+    
 
 @on_container
 @directives(ngpu=1)
 @MyProject.operation
 @MyProject.post(sampled)
 def sample(job):
+    import glob
     import warnings
 
     import unyt as u
@@ -124,7 +143,7 @@ def sample(job):
 
 
     with job:
-        inputs = [get_paths(i) for i in job.sp.input]
+        inputs = [get_paths(i,job) for i in job.sp.input]
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             compound = [Compound(i) for i in inputs]
@@ -182,6 +201,35 @@ def sample(job):
         job.doc["ref_distance"] = units.quantity_to_tuple(ref_distance)
         job.doc["ref_energy"] = units.quantity_to_tuple(ref_energy)
 
+        outfiles = glob.glob(f"{job.ws}/job*.o")
+        if outfiles:
+            tps,time = get_tps_time(outfiles)
+            job.doc["average_TPS"] = tps
+            job.doc["total_time"] = time
+
+
+def get_tps_time(outfiles):
+    import numpy as np
+
+    times = []
+    for ofile in outfiles:
+        with open(ofile) as f:
+            lines = f.readlines()
+            # first value is TPS for shrink, second value is for sim
+            tpsline = [l for l in lines if "Average TPS" in l][-1]
+            tps = tpsline.strip("Average TPS:").strip()
+
+            t_lines = [l for l in lines if "Time" in l]
+            h,m,s = t_lines[-1].split(" ")[1].split(":")
+            times.append(int(h)*3600 + int(m)*60 + int(s))
+    # total time in seconds
+    total_time = np.sum(times)
+    hh = total_time // 3600
+    mm = (total_time - hh*3600) // 60
+    ss = total_time % 60
+    return tps, f"{hh:02d}:{mm:02d}:{ss:02d}"
+
+
 @directives(ngpu=1)
 @on_pflow
 @MyProject.operation
@@ -227,5 +275,7 @@ def post_proc(job):
         ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
     dp_path=os.path.join(job.ws,"dp.npy")
     np.save(dp_path, q_list)
+
+
 if __name__ == "__main__":
     MyProject().main()

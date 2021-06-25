@@ -106,3 +106,20 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
 
 * Fry
 * Kestrel
+
+## Included shell scripts
+<details>
+     <summary>clean.sh</summary>
+clean.sh is a shell script file that will remove the workspace folder, including the files inside of it, along with any files matching status.txt, signac*, *.log, *.gsd, or *.out within the present planckton-flow clone you are using. To run, type the following in your terminal:
+
+    bash clean.sh 
+
+**THIS WILL DELETE ANY JOBS YOU HAVE RUN SO FAR! MAKE SURE YOU ARE IN THE CLONE OF PLANCKTON-FLOW THAT YOU WANT THE WORKSPACE REMOVED FROM!**
+</details>
+<details>
+     <summary>print_status.sh</summary>
+print_status.sh is a shell script file that prints out the status of your recently submitted jobs and saves this information to a file called status.txt. To run, type the following in your terminal:
+
+     bash print_status.sh
+
+</details>
