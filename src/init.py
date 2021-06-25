@@ -40,7 +40,7 @@ parameters = OrderedDict({
     "n_compounds": [100],
 
     # Density must be specified as a pair containing (value, unit)
-    "density": [(1.0, "g/cm**3")],
+    "density": [(0.9, "g/cm**3")],
     # Energy scaling "solvent" parameter
     "e_factor": [1.0],
 
@@ -56,7 +56,7 @@ parameters = OrderedDict({
 
     # Simulation parameters
     # Thermostat coupling
-    "tau": [1],
+    "tau": [0.03],
     # Number of steps to shrink the box
     "shrink_steps": [1e3],
     # Number of steps to run final simulation
