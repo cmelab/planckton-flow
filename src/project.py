@@ -108,9 +108,9 @@ def get_paths(key, job):
         )
 
 def on_container(func):
-        return flow.directives(
-                executable='singularity exec --nv $PLANCKTON_SIMG python'
-                )(func)
+    return flow.directives(
+        executable='singularity exec --nv $PLANCKTON_SIMG python'
+    )(func)
 
 
 
@@ -213,13 +213,18 @@ def get_tps_time(outfiles):
     for ofile in outfiles:
         with open(ofile) as f:
             lines = f.readlines()
-            # first value is TPS for shrink, second value is for sim
-            tpsline = [l for l in lines if "Average TPS" in l][-1]
-            tps = tpsline.strip("Average TPS:").strip()
+            try:
+                # first value is TPS for shrink, second value is for sim
+                tpsline = [l for l in lines if "Average TPS" in l][-1]
+                tps = tpsline.strip("Average TPS:").strip()
 
-            t_lines = [l for l in lines if "Time" in l]
-            h,m,s = t_lines[-1].split(" ")[1].split(":")
-            times.append(int(h)*3600 + int(m)*60 + int(s))
+                t_lines = [l for l in lines if "Time" in l]
+                h,m,s = t_lines[-1].split(" ")[1].split(":")
+                times.append(int(h)*3600 + int(m)*60 + int(s))
+            except IndexError:
+                # This will catch outputs from failures or non-hoomd operations
+                # (e.g. analysis) in the job dir
+                pass
     # total time in seconds
     total_time = np.sum(times)
     hh = total_time // 3600

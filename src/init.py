@@ -9,7 +9,7 @@ from itertools import product
 import signac
 
 
-project_name = "my_project"
+project_name = "debug"
 
 # Parameters used for generating the morphology
 parameters = OrderedDict({
