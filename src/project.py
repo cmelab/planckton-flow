@@ -122,8 +122,8 @@ def rdfed(job):
 def on_pflow(func):
    import sys                                            
                                                           
-    pypath = sys.executable                                                                     
-    return flow.directives(executable=f'{pypath}')(func)  
+   pypath = sys.executable                                                                     
+   return flow.directives(executable=f'{pypath}')(func)  
     
 
 @on_container
@@ -248,16 +248,25 @@ def post_proc(job):
     import freud
 
     gsdfile= job.fn('trajectory.gsd')
-    rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
-    x = rdf.bin_centers
-    y = rdf.rdf*norm
-    save_path= os.path.join(job.ws,"rdf.txt")
-    np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
-    plt.xlabel("r (A.U.)", fontsize=14)
-    plt.ylabel("g(r)", fontsize=14)
-    plt.plot(x, y)
-    save_plot= os.path.join(job.ws,"rdf.png")
-    plt.savefig(save_plot) 
+    with gsd.hoomd.open(gsdfile) as f:
+    	snap= f[0]
+    	all_atoms=snap.particles.types
+    	os.mkdir(os.path.join(job.ws,"rdf.txt"))
+    	os.mkdir(os.path.join(job.ws,"rdf.png"))
+    	for types in all_atoms:
+    		A_name=types
+    		B_name=types
+    		rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
+    		x = rdf.bin_centers
+    		y = rdf.rdf*norm
+    		save_path= os.path.join(job.ws,"rdf.txt/{}_rdf.txt".format(A_name))
+    		np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
+    		plt.xlabel("r (A.U.)", fontsize=14)
+    		plt.ylabel("g(r)", fontsize=14)
+    		plt.plot(x, y)
+    		save_plot= os.path.join(job.ws,"rdf.png/{}_rdf.png".format(A_name))
+    		plt.savefig(save_plot)
+ 
     with gsd.hoomd.open(gsdfile) as f:
         snap = f[-1]
         points = snap.particles.position
