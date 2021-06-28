@@ -237,8 +237,7 @@ def get_tps_time(outfiles):
 @MyProject.pre(sampled)
 def post_proc(job):
     import cmeutils
-    from cmeutils.structure import gsd_rdf
-    from cmeutils.structure import get_quaternions
+    from cmeutils.structure import gsd_rdf, get_quaternions
     import numpy as np
     import os
     import matplotlib
