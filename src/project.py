@@ -273,16 +273,13 @@ def post_proc(job):
         dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
         q_list= []
         os.mkdir(os.path.join(job.ws,"diffraction_plots"))
-    for q in cmeutils.structure.get_quaternions():
-        plt.savefig(os.path.join(job.ws,"diffraction_plots/%s.png" % (q)))
-        q_list.append(q)
+    for q in get_quaternions():
         fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
-        qx,qy,qz,qw = q
+        qx, qy, qz, qw = q
         dp.compute((box, points), view_orientation=q)
         dp.plot(ax=ax)
         ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
-    dp_path=os.path.join(job.ws,"dp.npy")
-    np.save(dp_path, q_list)
+        plt.savefig(os.path.join(job.ws, f"diffraction_plots/{q}.png"))
 
 
 if __name__ == "__main__":
