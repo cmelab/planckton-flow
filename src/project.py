@@ -268,11 +268,10 @@ def post_proc(job):
  
     with gsd.hoomd.open(gsdfile) as f:
         snap = f[-1]
-        points = snap.particles.position
-        box = freud.Box.from_box(snap.configuration.box)
-        dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
-        q_list= []
-        os.mkdir(os.path.join(job.ws,"diffraction_plots"))
+points = snap.particles.position
+box = freud.Box.from_box(snap.configuration.box)
+dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
+os.mkdir(os.path.join(job.ws,"diffraction_plots"))
     for q in get_quaternions():
         fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
         qx, qy, qz, qw = q
