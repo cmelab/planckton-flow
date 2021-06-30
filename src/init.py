@@ -37,7 +37,7 @@ parameters = OrderedDict({
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
     # "n_compounds" = [(100,100), (1000,500)]
-    "n_compounds": [100],
+    "n_compounds": [10],
 
     # Density must be specified as a pair containing (value, unit)
     "density": [(0.9, "g/cm**3")],
@@ -60,7 +60,7 @@ parameters = OrderedDict({
     # Number of steps to shrink the box
     "shrink_steps": [1e3],
     # Number of steps to run final simulation
-    "n_steps": [1e7],
+    "n_steps": [1e3],
     # Timestep size
     "dt": [0.0001],
     # Whether to remove hydrogen atoms

@@ -120,10 +120,10 @@ def rdfed(job):
 
 
 def on_pflow(func):
-    import sys                                            
+   import sys                                            
                                                           
-    pypath = sys.executable                                                                     
-    return flow.directives(executable=f'{pypath}')(func)  
+   pypath = sys.executable                                                                     
+   return flow.directives(executable=f'{pypath}')(func)  
     
 
 @on_container
@@ -237,8 +237,7 @@ def get_tps_time(outfiles):
 @MyProject.pre(sampled)
 def post_proc(job):
     import cmeutils
-    from cmeutils.structure import gsd_rdf
-    from cmeutils.structure import get_quaternions
+    from cmeutils.structure import gsd_rdf, get_quaternions
     import numpy as np
     import os
     import matplotlib
@@ -248,34 +247,38 @@ def post_proc(job):
     import freud
 
     gsdfile= job.fn('trajectory.gsd')
-    rdf,norm = gsd_rdf(gsdfile,A_name='c', B_name='c', r_min=0.01, r_max=6)
-    x = rdf.bin_centers
-    y = rdf.rdf*norm
-    save_path= os.path.join(job.ws,"rdf.txt")
-    np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
-    plt.xlabel("r (A.U.)", fontsize=14)
-    plt.ylabel("g(r)", fontsize=14)
-    plt.plot(x, y)
-    save_plot= os.path.join(job.ws,"rdf.png")
-    plt.savefig(save_plot) 
     with gsd.hoomd.open(gsdfile) as f:
-        snap = f[-1]
-        points = snap.particles.position
-        box = freud.Box.from_box(snap.configuration.box)
-        dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
-        q_list= []
-        os.mkdir(os.path.join(job.ws,"diffraction_plots"))
-    for q in cmeutils.structure.get_quaternions():
-        plt.savefig(os.path.join(job.ws,"diffraction_plots/%s.png" % (q)))
-        q_list.append(q)
-        fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
-        qx,qy,qz,qw = q
-        dp.compute((box, points), view_orientation=q)
-        dp.plot(ax=ax)
-        ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
-    dp_path=os.path.join(job.ws,"dp.npy")
-    np.save(dp_path, q_list)
-
+    	snap= f[0]
+    	all_atoms=snap.particles.types
+    	os.mkdir(os.path.join(job.ws,"rdf_txt"))
+    	os.mkdir(os.path.join(job.ws,"rdf_png"))
+    	for types in all_atoms:
+    		A_name=types
+    		B_name=types
+    		rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
+    		x = rdf.bin_centers
+    		y = rdf.rdf*norm
+    		save_path= os.path.join(job.ws,"rdf_txt/{}_rdf.txt".format(A_name))
+    		np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
+    		plt.xlabel("r (A.U.)", fontsize=14)
+    		plt.ylabel("g(r)", fontsize=14)
+    		plt.plot(x, y)
+    		save_plot= os.path.join(job.ws,"rdf_png/{}_rdf.png".format(A_name))
+    		plt.savefig(save_plot)
+ 
+    with gsd.hoomd.open(gsdfile) as f:
+    	snap = f[-1]
+    	points = snap.particles.position
+    	box = freud.Box.from_box(snap.configuration.box)
+    	dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
+    	os.mkdir(os.path.join(job.ws,"diffraction_plots"))
+    	for q in get_quaternions():
+    		fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
+    		qx, qy, qz, qw = q
+    		dp.compute((box, points), view_orientation=q)
+    		dp.plot(ax=ax)
+    		ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
+    		plt.savefig(os.path.join(job.ws, f"diffraction_plots/{q}.png"))
 
 if __name__ == "__main__":
     MyProject().main()
