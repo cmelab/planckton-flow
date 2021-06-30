@@ -37,10 +37,10 @@ parameters = OrderedDict({
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
     # "n_compounds" = [(100,100), (1000,500)]
-    "n_compounds": [50],
+    "n_compounds": [60],
 
     # Density must be specified as a pair containing (value, unit)
-    "density": [(1.25, "g/cm**3")],
+    "density": [(1.00, "g/cm**3")],
     # Energy scaling "solvent" parameter
     "e_factor": [1.0],
 
@@ -52,7 +52,7 @@ parameters = OrderedDict({
         ],
 
     # Reduced temperatures specified in simulation units
-    "kT_reduced": [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5],
+    "kT_reduced": [1.0],
 
     # Simulation parameters
     # Thermostat coupling
