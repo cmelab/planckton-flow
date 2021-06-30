@@ -108,9 +108,9 @@ def get_paths(key, job):
         )
 
 def on_container(func):
-        return flow.directives(
-                executable='singularity exec --nv $PLANCKTON_SIMG python'
-                )(func)
+    return flow.directives(
+        executable='singularity exec --nv $PLANCKTON_SIMG python'
+    )(func)
 
 
 
@@ -213,13 +213,18 @@ def get_tps_time(outfiles):
     for ofile in outfiles:
         with open(ofile) as f:
             lines = f.readlines()
-            # first value is TPS for shrink, second value is for sim
-            tpsline = [l for l in lines if "Average TPS" in l][-1]
-            tps = tpsline.strip("Average TPS:").strip()
+            try:
+                # first value is TPS for shrink, second value is for sim
+                tpsline = [l for l in lines if "Average TPS" in l][-1]
+                tps = tpsline.strip("Average TPS:").strip()
 
-            t_lines = [l for l in lines if "Time" in l]
-            h,m,s = t_lines[-1].split(" ")[1].split(":")
-            times.append(int(h)*3600 + int(m)*60 + int(s))
+                t_lines = [l for l in lines if "Time" in l]
+                h,m,s = t_lines[-1].split(" ")[1].split(":")
+                times.append(int(h)*3600 + int(m)*60 + int(s))
+            except IndexError:
+                # This will catch outputs from failures or non-hoomd operations
+                # (e.g. analysis) in the job dir
+                pass
     # total time in seconds
     total_time = np.sum(times)
     hh = total_time // 3600
@@ -242,23 +247,63 @@ def post_proc(job):
     import matplotlib.pyplot as plt
     import gsd
     import gsd.hoomd
+    import gsd.pygsd
     import freud
 
+    def atom_type_pos(snap, atom_type):
+        if not isinstance(atom_type, list):
+            atom_type = [atom_type]
+        positions = []
+        for atom in atom_type:
+            indices = np.where(snap.particles.typeid == snap.particles.types.index(atom))
+            positions.append(snap.particles.position[indices])
+        return np.concatenate(positions)
+    
+    def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type=types, msd_mode = "window"):
+        f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
+        trajectory = gsd.hoomd.HOOMDTrajectory(f)
+        positions = []
+        for frame in trajectory[start:stop]:
+            if atom_type == 'all':
+                atom_positions = frame.particles.position[:]
+            else:
+                atom_positions = atom_type_pos(frame, atom_type)
+            positions.append(atom_positions)
+        msd = freud.msd.MSD(box=trajectory[-1].configuration.box, mode=msd_mode)
+        msd.compute(positions)
+        f.close()
+    return(msd.msd)
+    
     gsdfile= job.fn('trajectory.gsd')
-    A_name='c'
-    B_name='c'
-    rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
-    x = rdf.bin_centers
-    y = rdf.rdf*norm
-    save_path= os.path.join(job.ws,"rdf.txt")
-    np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
-    plt.plot(x, y)
-    plt.xlabel("r (A.U.)", fontsize=14)
-    plt.ylabel("g(r)", fontsize=14)
-    plt.title("%s mol %s and %s's at %s and %s kT" % (job.sp['n_compounds'], A_name, B_name, job.sp['density'], job.sp['kT_reduced']), fontsize=16)
-    save_plot= os.path.join(job.ws,"rdf.png")
-    plt.savefig(save_plot)
-
+    with gsd.hoomd.open(gsdfile, mode="rb") as f:
+    	snap = f[0]
+    	all_atoms = snap.particles.types
+    	os.makedirs(os.path.join(job.ws,"rdf/rdf_txt_files"))
+    	os.makedirs(os.path.join(job.ws,"rdf/rdf_png_files"))
+        os.makedirs(os.path.join(job.ws,"msd/msd_npy_files"))
+        os.makedirs(os.path.join(job.ws,"msd/msd_png_files"))
+    	for types in all_atoms:
+    		A_name=types
+    		B_name=types
+    		rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
+    		x = rdf.bin_centers
+    		y = rdf.rdf*norm
+    		save_path= os.path.join(job.ws,"rdf/rdf_txt_files/{}_rdf.txt".format(types))
+    		np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
+    		plt.plot(x, y)
+    		plt.xlabel("r (A.U.)", fontsize=14)
+    		plt.ylabel("g(r)", fontsize=14)
+    		plt.title("%s mol %s and %s's at %s and %s kT" % (job.sp['n_compounds'], A_name, B_name, job.sp['density'], job.sp['kT_reduced']), fontsize=16)
+    		save_plot= os.path.join(job.ws,"rdf/rdf_png_files/{}_rdf.png".format(types))
+    		plt.savefig(save_plot)
+    		msd_array=msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type=types, msd_mode = "window")
+    		save_path= os.path.join(job.ws, "msd/msd_npy_files/{}.npy".format(types))
+    		np.save(save_path, msd_array)
+    		msd_graph = msd_from_gsd(job.fn('trajectory.gsd'), atom_type=types)
+    		plt.plot(msd_graph, label=job.sp['kT_reduced'])
+    		plt.title("MSD of %s %s's at %s kT and %s den" % (job.sp['input'], types, job.sp['kT_reduced'], job.sp['density']))
+    		save_plot= os.path.join(job.ws,"msd/msd_png_files/{}_msd.png".format(types))
+            
     with gsd.hoomd.open(gsdfile) as f:
         snap = f[-1]
         points = snap.particles.position

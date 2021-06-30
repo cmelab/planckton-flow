@@ -9,7 +9,7 @@ from itertools import product
 import signac
 
 
-project_name = "my_project"
+project_name = "debug"
 
 # Parameters used for generating the morphology
 parameters = OrderedDict({
@@ -37,7 +37,7 @@ parameters = OrderedDict({
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
     # "n_compounds" = [(100,100), (1000,500)]
-    "n_compounds": [100, 200],
+    "n_compounds": [50],
 
     # Density must be specified as a pair containing (value, unit)
     "density": [(1.25, "g/cm**3")],
