@@ -259,30 +259,30 @@ def post_proc(job):
             positions.append(snap.particles.position[indices])
         return np.concatenate(positions)
     
-    def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type=atom_type, msd_mode = "window"):
-        f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
-        trajectory = gsd.hoomd.HOOMDTrajectory(f)
-        positions = []
-        for frame in trajectory[start:stop]:
-            if atom_type == 'all':
-                atom_positions = frame.particles.position[:]
-            else:
-                atom_positions = atom_type_pos(frame, atom_type)
-            positions.append(atom_positions)
-        msd = freud.msd.MSD(box=trajectory[-1].configuration.box, mode=msd_mode)
-        msd.compute(positions)
-        f.close()
-    return(msd.msd)
-    
+    def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type='types', msd_mode = "window"):
+    	f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
+    	trajectory = gsd.hoomd.HOOMDTrajectory(f)
+    	positions = []
+    	for frame in trajectory[start:stop]:
+    		if atom_type == 'all':
+    			atom_positions = frame.particles.position[:]
+    		else:
+    			atom_positions = atom_type_pos(frame, atom_type)
+    			positions.append(atom_positions)
+    	msd = freud.msd.MSD(box=trajectory[-1].configuration.box, mode=msd_mode)
+    	msd.compute(positions)
+    	f.close()
+    	return(msd.msd)
+ 
     gsdfile= job.fn('trajectory.gsd')
     with gsd.hoomd.open(gsdfile, mode="rb") as f:
-        snap = f[0]
-        all_atoms = snap.particles.types
-        os.makedirs(os.path.join(job.ws,"rdf/rdf_txt_files"))
-        os.makedirs(os.path.join(job.ws,"rdf/rdf_png_files"))
-        os.makedirs(os.path.join(job.ws,"msd/msd_npy_files"))
-        os.makedirs(os.path.join(job.ws,"msd/msd_png_files"))
-    for types in all_atoms:
+    	snap = f[0]
+    	all_atoms = snap.particles.types
+    	os.makedirs(os.path.join(job.ws,"rdf/rdf_txt_files"))
+    	os.makedirs(os.path.join(job.ws,"rdf/rdf_png_files"))
+    	os.makedirs(os.path.join(job.ws,"msd/msd_npy_files"))
+    	os.makedirs(os.path.join(job.ws,"msd/msd_png_files"))
+    	for types in all_atoms:
     		A_name=types
     		B_name=types
     		rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
@@ -303,6 +303,7 @@ def post_proc(job):
     		plt.plot(msd_graph, label=job.sp['kT_reduced'])
     		plt.title("MSD of %s %s's at %s kT and %s den" % (job.sp['input'], types, job.sp['kT_reduced'], job.sp['density']))
     		save_plot= os.path.join(job.ws,"msd/msd_png_files/{}_msd.png".format(types))
+    		plt.savefig(save_plot)
             
     with gsd.hoomd.open(gsdfile) as f:
         snap = f[-1]
