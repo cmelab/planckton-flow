@@ -259,7 +259,7 @@ def post_proc(job):
             positions.append(snap.particles.position[indices])
         return np.concatenate(positions)
     
-    def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type=types, msd_mode = "window"):
+    def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type=atom_type, msd_mode = "window"):
         f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
         trajectory = gsd.hoomd.HOOMDTrajectory(f)
         positions = []
@@ -276,13 +276,13 @@ def post_proc(job):
     
     gsdfile= job.fn('trajectory.gsd')
     with gsd.hoomd.open(gsdfile, mode="rb") as f:
-    	snap = f[0]
-    	all_atoms = snap.particles.types
-    	os.makedirs(os.path.join(job.ws,"rdf/rdf_txt_files"))
-    	os.makedirs(os.path.join(job.ws,"rdf/rdf_png_files"))
+        snap = f[0]
+        all_atoms = snap.particles.types
+        os.makedirs(os.path.join(job.ws,"rdf/rdf_txt_files"))
+        os.makedirs(os.path.join(job.ws,"rdf/rdf_png_files"))
         os.makedirs(os.path.join(job.ws,"msd/msd_npy_files"))
         os.makedirs(os.path.join(job.ws,"msd/msd_png_files"))
-    	for types in all_atoms:
+    for types in all_atoms:
     		A_name=types
     		B_name=types
     		rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
