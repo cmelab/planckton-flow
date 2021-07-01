@@ -246,6 +246,29 @@ def post_proc(job):
     import gsd.hoomd
     import freud
 
+    def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type='c', msd_mode = "window"):
+    	f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
+    	trajectory = gsd.hoomd.HOOMDTrajectory(f)
+    	positions = []
+    	for frame in trajectory[start:stop]:
+        	if atom_type == 'all':
+            		atom_positions = frame.particles.position[:]
+        	else:
+            		atom_positions = atom_type_pos(frame, atom_type)
+        	positions.append(atom_positions)
+    	msd = freud.msd.MSD(box=trajectory[-1].configuration.box, mode=msd_mode)
+    	msd.compute(positions)
+    	f.close()
+    	return(msd.msd)
+    def atom_type_pos(snap, atom_type):
+    	if not isinstance(atom_type, list):
+        	atom_type = [atom_type]
+    	positions = []
+    	for atom in atom_type:
+        	indices = np.where(snap.particles.typeid == snap.particles.types.index(atom))
+        	positions.append(snap.particles.position[indices])
+    	return np.concatenate(positions)
+
     gsdfile= job.fn('trajectory.gsd')
     with gsd.hoomd.open(gsdfile) as f:
     	snap= f[0]
