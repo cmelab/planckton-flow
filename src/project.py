@@ -229,6 +229,33 @@ def get_tps_time(outfiles):
     ss = total_time % 60
     return tps, f"{hh:02d}:{mm:02d}:{ss:02d}"
 
+def atom_type_pos(snap, atom_type):
+    import numpy as np
+    if not isinstance(atom_type, list):
+        atom_type = [atom_type]
+    positions = []
+    for atom in atom_type:
+        indices = np.where(snap.particles.typeid == snap.particles.types.index(atom))
+        positions.append(snap.particles.position[indices])
+    return np.concatenate(positions)
+
+def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type='c', msd_mode = "window"):
+    import freud
+    import gsd
+    from gsd import pygsd
+    f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
+    trajectory = gsd.hoomd.HOOMDTrajectory(f)
+    positions = []
+    for frame in trajectory[start:stop]:
+        if atom_type == 'all':
+            atom_positions = frame.particles.position[:]
+        else:
+            atom_positions = atom_type_pos(frame, atom_type)
+        positions.append(atom_positions)
+    msd = freud.msd.MSD(box=trajectory[-1].configuration.box, mode=msd_mode)
+    msd.compute(positions)
+    f.close()
+    return(msd.msd)
 
 @directives(ngpu=1)
 @on_pflow
@@ -247,19 +274,21 @@ def post_proc(job):
     import freud
 
     def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type='c', msd_mode = "window"):
-    	f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
-    	trajectory = gsd.hoomd.HOOMDTrajectory(f)
-    	positions = []
-    	for frame in trajectory[start:stop]:
+        from gsd import pygsd
+        import freud
+        f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
+        trajectory = gsd.hoomd.HOOMDTrajectory(f)
+        positions = []
+        for frame in trajectory[start:stop]:
         	if atom_type == 'all':
             		atom_positions = frame.particles.position[:]
         	else:
             		atom_positions = atom_type_pos(frame, atom_type)
         	positions.append(atom_positions)
-    	msd = freud.msd.MSD(box=trajectory[-1].configuration.box, mode=msd_mode)
-    	msd.compute(positions)
-    	f.close()
-    	return(msd.msd)
+        msd = freud.msd.MSD(box=trajectory[-1].configuration.box, mode=msd_mode)
+        msd.compute(positions)
+        f.close()
+        return(msd.msd)
     def atom_type_pos(snap, atom_type):
     	if not isinstance(atom_type, list):
         	atom_type = [atom_type]
@@ -271,37 +300,47 @@ def post_proc(job):
 
     gsdfile= job.fn('trajectory.gsd')
     with gsd.hoomd.open(gsdfile) as f:
-    	snap= f[0]
-    	all_atoms=snap.particles.types
-    	os.mkdir(os.path.join(job.ws,"rdf_txt"))
-    	os.mkdir(os.path.join(job.ws,"rdf_png"))
-    	for types in all_atoms:
-    		A_name=types
-    		B_name=types
-    		rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
-    		x = rdf.bin_centers
-    		y = rdf.rdf*norm
-    		save_path= os.path.join(job.ws,"rdf_txt/{}_rdf.txt".format(A_name))
-    		np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
-    		plt.xlabel("r (A.U.)", fontsize=14)
-    		plt.ylabel("g(r)", fontsize=14)
-    		plt.plot(x, y)
-    		save_plot= os.path.join(job.ws,"rdf_png/{}_rdf.png".format(A_name))
-    		plt.savefig(save_plot)
- 
+        snap= f[0]
+        all_atoms=snap.particles.types
+        os.makedirs(os.path.join(job.ws,"rdf/rdf_txt"))
+        os.makedirs(os.path.join(job.ws,"rdf/rdf_png"))
+        os.makedirs(os.path.join(job.ws,"msd/msd_array"))
+        os.makedirs(os.path.join(job.ws,"msd/msd_png"))
+        os.makedirs(os.path.join(job.ws,"diffraction/diffraction_plots"))
+        for types in all_atoms:
+            A_name=types
+            B_name=types
+            rdf,norm = gsd_rdf(gsdfile,A_name, B_name, r_min=0.01, r_max=5)
+            x = rdf.bin_centers
+            y = rdf.rdf*norm
+            save_path= os.path.join(job.ws,"rdf/rdf_txt/{}_rdf.txt".format(A_name))
+            np.savetxt(save_path, np.transpose([x,y]), delimiter=',', header= "bin_centers, rdf")
+            plt.xlabel("r (A.U.)", fontsize=14)
+            plt.ylabel("g(r)", fontsize=14)
+            plt.plot(x, y)
+            save_plot= os.path.join(job.ws,"rdf/rdf_png/{}_rdf.png".format(A_name))
+            plt.savefig(save_plot)
+            msd_array= msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type=A_name, msd_mode = "window")
+            save_path= os.path.join(job.ws, "msd/msd_array/{}.npy".format(A_name))
+            np.save(save_path, msd_array)
+            plt.plot(msd_array)
+            plt.title("msd of %s %s's at %skT and %sden" % (job.sp['input'], A_name, job.sp['kT_reduced'], job.sp['density']))
+            plt.xlabel("frames", fontsize=14)
+            plt.ylabel("msd", fontsize=14)
+            save_msd= os.path.join(job.ws, "msd/msd_png/{}.png".format(A_name))
+            plt.savefig(save_msd)
     with gsd.hoomd.open(gsdfile) as f:
-    	snap = f[-1]
-    	points = snap.particles.position
-    	box = freud.Box.from_box(snap.configuration.box)
-    	dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
-    	os.mkdir(os.path.join(job.ws,"diffraction_plots"))
-    	for q in get_quaternions():
-    		fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
-    		qx, qy, qz, qw = q
-    		dp.compute((box, points), view_orientation=q)
-    		dp.plot(ax=ax)
-    		ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
-    		plt.savefig(os.path.join(job.ws, f"diffraction_plots/{q}.png"))
+        snap = f[-1]
+        points = snap.particles.position
+        box = freud.Box.from_box(snap.configuration.box)
+        dp = freud.diffraction.DiffractionPattern(grid_size=1024, output_size=1024)
+        for q in get_quaternions():
+                fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
+                qx, qy, qz, qw = q
+                dp.compute((box, points), view_orientation=q)
+                dp.plot(ax=ax)
+                ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
+                plt.savefig(os.path.join(job.ws, f"diffraction/diffraction_plots/{q}.png"))
 
 if __name__ == "__main__":
     MyProject().main()

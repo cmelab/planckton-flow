@@ -40,7 +40,8 @@ parameters = OrderedDict({
     "n_compounds": [100],
 
     # Density must be specified as a pair containing (value, unit)
-    "density": [(0.6, "g/cm**3"),(0.7, "g/cm**3"),(0.8, "g/cm**3"),(0.9, "g/cm**3"),(1.0, "g/cm**3"),(1.1, "g/cm**3"),(1.2, "g/cm**3")],
+   "density": [(0.9, "g/cm**3")],
+
     # Energy scaling "solvent" parameter
     "e_factor": [1.0],
 
@@ -52,11 +53,12 @@ parameters = OrderedDict({
         ],
 
     # Reduced temperatures specified in simulation units
-    "kT_reduced": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5],
+    "kT_reduced": [1.0],
 
     # Simulation parameters
     # Thermostat coupling
     "tau": [0.03],
+
     # Number of steps to shrink the box
     "shrink_steps": [1e3],
     # Number of steps to run final simulation
