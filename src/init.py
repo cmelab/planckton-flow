@@ -37,6 +37,7 @@ parameters = OrderedDict({
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
     # "n_compounds" = [(100,100), (1000,500)]
+    # Value for n_compounds must be an integer, not a float.(Example: Use 2 instead of 2.0)
     "n_compounds": [100],
 
     # Density must be specified as a pair containing (value, unit)
