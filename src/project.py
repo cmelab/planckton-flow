@@ -101,12 +101,9 @@ def get_paths(key, job):
         elif path.isfile(file_path):
             print(f"Using {file_path} for structure")
             return file_path
-        raise FileNotFoundError(
-            "Please provide either a path to a file (the absolute path or the "
-            "relative path in the planckton-flow root directory) or a key to "
-            f"the COMPOUND dictionary: {COMPOUND.keys()}\n"
-            f"You provided: {key}"
-        )
+        else:
+            print(f"Using {key} for structure--assuming SMILES input")
+            return key
 
 def on_container(func):
     return flow.directives(
