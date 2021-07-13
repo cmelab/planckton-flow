@@ -108,9 +108,9 @@ def get_paths(key, job):
         )
 
 def on_container(func):
-        return flow.directives(
-                executable='singularity exec --nv $PLANCKTON_SIMG python'
-                )(func)
+    return flow.directives(
+        executable='singularity exec --nv $PLANCKTON_SIMG python'
+    )(func)
 
 
 
@@ -124,7 +124,6 @@ def on_pflow(func):
                                                           
    pypath = sys.executable                                                                     
    return flow.directives(executable=f'{pypath}')(func)  
-    
 
 @on_container
 @directives(ngpu=1)
@@ -215,47 +214,24 @@ def get_tps_time(outfiles):
     for ofile in outfiles:
         with open(ofile) as f:
             lines = f.readlines()
-            # first value is TPS for shrink, second value is for sim
-            tpsline = [l for l in lines if "Average TPS" in l][-1]
-            tps = tpsline.strip("Average TPS:").strip()
+            try:
+                # first value is TPS for shrink, second value is for sim
+                tpsline = [l for l in lines if "Average TPS" in l][-1]
+                tps = tpsline.strip("Average TPS:").strip()
 
-            t_lines = [l for l in lines if "Time" in l]
-            h,m,s = t_lines[-1].split(" ")[1].split(":")
-            times.append(int(h)*3600 + int(m)*60 + int(s))
+                t_lines = [l for l in lines if "Time" in l]
+                h,m,s = t_lines[-1].split(" ")[1].split(":")
+                times.append(int(h)*3600 + int(m)*60 + int(s))
+            except IndexError:
+                # This will catch outputs from failures or non-hoomd operations
+                # (e.g. analysis) in the job dir
+                pass
     # total time in seconds
     total_time = np.sum(times)
     hh = total_time // 3600
     mm = (total_time - hh*3600) // 60
     ss = total_time % 60
     return tps, f"{hh:02d}:{mm:02d}:{ss:02d}"
-
-def atom_type_pos(snap, atom_type):
-    import numpy as np
-    if not isinstance(atom_type, list):
-        atom_type = [atom_type]
-    positions = []
-    for atom in atom_type:
-        indices = np.where(snap.particles.typeid == snap.particles.types.index(atom))
-        positions.append(snap.particles.position[indices])
-    return np.concatenate(positions)
-
-def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type='c', msd_mode = "window"):
-    import freud
-    import gsd
-    from gsd import pygsd
-    f = gsd.pygsd.GSDFile(open(gsdfile, "rb"))
-    trajectory = gsd.hoomd.HOOMDTrajectory(f)
-    positions = []
-    for frame in trajectory[start:stop]:
-        if atom_type == 'all':
-            atom_positions = frame.particles.position[:]
-        else:
-            atom_positions = atom_type_pos(frame, atom_type)
-        positions.append(atom_positions)
-    msd = freud.msd.MSD(box=trajectory[-1].configuration.box, mode=msd_mode)
-    msd.compute(positions)
-    f.close()
-    return(msd.msd)
 
 @directives(ngpu=1)
 @on_pflow
@@ -271,6 +247,7 @@ def post_proc(job):
     import matplotlib.pyplot as plt
     import gsd
     import gsd.hoomd
+    import gsd.pygsd
     import freud
 
     def msd_from_gsd(gsdfile, start=-30, stop=-1, atom_type='c', msd_mode = "window"):
@@ -289,17 +266,10 @@ def post_proc(job):
         msd.compute(positions)
         f.close()
         return(msd.msd)
-    def atom_type_pos(snap, atom_type):
-    	if not isinstance(atom_type, list):
-        	atom_type = [atom_type]
-    	positions = []
-    	for atom in atom_type:
-        	indices = np.where(snap.particles.typeid == snap.particles.types.index(atom))
-        	positions.append(snap.particles.position[indices])
-    	return np.concatenate(positions)
 
     gsdfile= job.fn('trajectory.gsd')
     with gsd.hoomd.open(gsdfile) as f:
+        type_pos = gsd_utils.get_type_position(typename="c", snap=frame)
         snap= f[0]
         all_atoms=snap.particles.types
         os.makedirs(os.path.join(job.ws,"rdf/rdf_txt"))
@@ -341,6 +311,5 @@ def post_proc(job):
                 dp.plot(ax=ax)
                 ax.set_title(f"Diffraction Pattern\nq=[{qx:.2f} {qy:.2f} {qz:.2f} {qw:.2f}]")
                 plt.savefig(os.path.join(job.ws, f"diffraction/diffraction_plots/{q}.png"))
-
 if __name__ == "__main__":
     MyProject().main()

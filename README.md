@@ -29,14 +29,14 @@ PlanckTon-flow uses the [conda](https://conda.io/projects/conda/en/latest/user-g
 
     ```bash
     cd ~/images
-    singularity pull docker://cmelab/planckton_gpu:latest
-    export PLANCKTON_SIMG=$(pwd)/planckton_gpu_latest.sif
+    singularity pull docker://cmelab/planckton_gpu:v0.4.0
+    export PLANCKTON_SIMG=$(pwd)/planckton_gpu_v0.4.0.sif
     ```
 
     Or you can run this command (while still in the directory where you pulled the image) to add the image location to your bashrc file so you never have to run this step again
 
     ```bash
-    echo "export PLANCKTON_SIMG=$(pwd)/planckton_gpu_latest.sif" >> ~/.bashrc
+    echo "export PLANCKTON_SIMG=$(pwd)/planckton_gpu_V0.4.0.sif" >> ~/.bashrc
     ```
 
 And that's it--you are ready to run simulations!
