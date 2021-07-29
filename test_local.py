@@ -5,10 +5,10 @@ import signac
 from src import init, project
 
 
-test_params = OrderedDict({
+test_params = {
     "input": [["PCBM-gaff"]],
     "n_compounds": [5],
-    "density": [(1.0, "g/cm**3")],
+    "density": ["1.0_g-cm**3"],
     "e_factor": [0.5],
     "forcefield": ["gaff-custom"],
     "kT_reduced": [0.5],
@@ -18,7 +18,7 @@ test_params = OrderedDict({
     "dt": [0.0001],
     "remove_hydrogens": [False],
     "mode": ["cpu"]
-})
+}
 
 
 def test():

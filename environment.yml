@@ -2,9 +2,9 @@ name: planckton-flow
 channels:
   - conda-forge
 dependencies:
-  - gsd=2.2.0
+  - gsd=2.4.2
   - pip=20.2
   - pytest
   - python=3.7
-  - signac=1.6.0
-  - signac-flow=0.13.0
+  - signac=1.7.0
+  - signac-flow=0.14.0
