@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container: 
-        image: cmelab/planckton_cpu:v0.4.0
+        image: cmelab/planckton_cpu:latest
 
     steps:
     - uses: actions/checkout@v2
