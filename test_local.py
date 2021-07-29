@@ -6,8 +6,8 @@ from src import init, project
 
 
 test_params = {
-    "input": [["PCBM-gaff", "P3HT-16-gaff"]],
-    "n_compounds": [[5,5]],
+    "input": [("PCBM-gaff", "P3HT-16-gaff")],
+    "n_compounds": [(5,5)],
     "density": ["1.0_g-cm**3"],
     "e_factor": [0.5],
     "forcefield": ["gaff-custom"],
