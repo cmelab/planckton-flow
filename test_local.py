@@ -8,7 +8,7 @@ from src import init, project
 test_params = {
     "input": [["PCBM-gaff"]],
     "n_compounds": [5],
-    "density": [(1.0, "g/cm**3")],
+    "density": ["1.0_g-cm**3"],
     "e_factor": [0.5],
     "forcefield": ["gaff-custom"],
     "kT_reduced": [0.5],
