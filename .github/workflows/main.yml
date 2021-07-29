@@ -11,6 +11,8 @@ on:
     paths:
       - "src/*"
       - "test_local.py"
+  # Allows workflow to be manually triggered
+  workflow_dispatch:
 
 jobs:
   build:
