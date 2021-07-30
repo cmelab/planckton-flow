@@ -35,9 +35,10 @@ parameters = {
 
     # If a mixture is used, the number of each compound in the mixture
     # needs to be specified:
-    # "n_compounds" = [(100,100), (1000,500)]
+    # "n_compounds" = [[100,100], [1000,500]]
+    # Even if not doing a mixture, enter n_compounds as a list or tuple (Example: [[100]]
     # Value for n_compounds must be an integer, not a float. (Example: Use 2 instead of 2.0)
-    "n_compounds": [100],
+    "n_compounds": [[100]],
 
     # Density specified as a string, like "value_unit" replacing "/" with "-"
     "density": ["1.0_g-cm**3"],
