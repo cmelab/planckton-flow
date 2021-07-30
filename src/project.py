@@ -135,7 +135,7 @@ def sample(job):
             packer = Pack(
                 compound,
                 ff=FORCEFIELD[job.sp.forcefield],
-                n_compounds=job.sp.n_compounds,
+                n_compounds=list(job.sp.n_compounds),
                 density=units.string_to_quantity(job.sp.density),
                 remove_hydrogen_atoms=job.sp.remove_hydrogens,
             )
