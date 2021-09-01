@@ -13,6 +13,7 @@ test_params = {
     "forcefield": ["gaff-custom"],
     "kT_reduced": [0.5],
     "tau": [1],
+    "r_cut":[2.5],
     "shrink_steps": [1e3],
     "n_steps": [1e3],
     "dt": [0.0001],

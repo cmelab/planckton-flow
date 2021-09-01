@@ -58,6 +58,8 @@ parameters = {
     # Simulation parameters
     # Thermostat coupling period
     "tau": [1],
+    # Potential cutoff
+    "r_cut": [2.5],
     # Number of steps to shrink the box
     "shrink_steps": [1e3],
     # Number of steps to run final simulation
