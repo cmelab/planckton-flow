@@ -56,7 +56,7 @@ parameters = {
     "kT_reduced": [1.0],
 
     # Simulation parameters
-    # Thermostat coupling
+    # Thermostat coupling period
     "tau": [1],
     # Number of steps to shrink the box
     "shrink_steps": [1e3],
