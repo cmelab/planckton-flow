@@ -157,8 +157,7 @@ def sample(job):
         )
 
 
-        my_sim.run()
-        job.doc["done"] = True
+        job.doc["done"] = my_sim.run()
 
         ref_distance = my_sim.ref_values.distance * u.Angstrom
         ref_energy = my_sim.ref_values.energy * u.kcal / u.mol
