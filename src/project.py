@@ -71,18 +71,9 @@ class Kestrel(DefaultSlurmEnvironment):
 
 
 # Definition of project-related labels (classification)
-def current_step(job):
-    import gsd.hoomd
-
-    if job.isfile("trajectory.gsd"):
-        with gsd.hoomd.open(job.fn("trajectory.gsd")) as traj:
-            return traj[-1].configuration.step
-    return -1
-
-
 @MyProject.label
 def sampled(job):
-    return current_step(job) >= job.doc.steps
+    return job.doc.get("done")
 
 
 def get_paths(key, job):
@@ -166,7 +157,7 @@ def sample(job):
         )
 
 
-        my_sim.run()
+        job.doc["done"] = my_sim.run()
 
         ref_distance = my_sim.ref_values.distance * u.Angstrom
         ref_energy = my_sim.ref_values.energy * u.kcal / u.mol
