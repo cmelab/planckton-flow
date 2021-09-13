@@ -7,8 +7,8 @@ from src import init, project
 
 test_params = {
     "input": [("PCBM-gaff", "P3HT-16-gaff")],
-    "n_compounds": [(5,5)],
-    "density": ["1.0_g-cm**3"],
+    "n_compounds": [(2,2)],
+    "density": ["0.1_g-cm**3"],
     "e_factor": [0.5],
     "forcefield": ["gaff-custom"],
     "kT_reduced": [0.5],
@@ -16,7 +16,7 @@ test_params = {
     "r_cut":[2.5],
     "shrink_steps": [1e3],
     "n_steps": [1e3],
-    "dt": [0.0001],
+    "dt": [0.001],
     "remove_hydrogens": [False],
     "mode": ["cpu"]
 }
