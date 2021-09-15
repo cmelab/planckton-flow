@@ -139,6 +139,7 @@ def sample(job):
             n_steps=job.sp.n_steps,
             shrink_steps=job.sp.shrink_steps,
             tau=job.sp.tau,
+            r_cut=job.sp.r_cut,
             dt=job.sp.dt,
             mode=job.sp.mode,
             target_length=target_length,
