@@ -104,6 +104,8 @@ The basic workflow is something like this:
 
 Beyond the officially supported [flow environments](https://docs.signac.io/projects/flow/en/latest/supported_environments.html#supported-environments) we support:
 
+* R2
+* Borah
 * Fry
 * Kestrel
 
