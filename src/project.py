@@ -184,8 +184,8 @@ def sample(job):
         ref_mass = my_sim.ref_values.mass * u.amu
 
         job.doc["T_SI"] = units.quantity_to_string(
-            units.kelvin_from_reduced(job.sp.kT_reduced, ref_energy)
-            )
+            units.kelvin_from_reduced(job.sp.kT, ref_energy)
+        )
         job.doc["real_timestep"] = units.quantity_to_string(
             units.convert_to_real_time(
                 job.sp.dt, ref_mass, ref_distance, ref_energy
