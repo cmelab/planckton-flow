@@ -92,7 +92,7 @@ def main(parameters):
         parent_statepoint = dict(zip(param_names, params))
         parent_job = project.open_job(parent_statepoint)
         parent_job.init()
-        parent_job.doc.setdefault("steps", parent_statepoint["n_steps"])
+        parent_job.doc.setdefault("steps", sum(parent_statepoint["n_steps"]))
     project.write_statepoints()
     print(f"Initialized. ({len(param_combinations)} total jobs)")
 
