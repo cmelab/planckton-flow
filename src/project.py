@@ -181,7 +181,7 @@ def sample(job):
 
         ref_distance = my_sim.ref_values.distance * u.Angstrom
         ref_energy = my_sim.ref_values.energy * u.kcal / u.mol
-        ref_mass = my_sim.ref_values.mass * u.amu
+        ref_mass = my_sim.ref_values.mass *	0.9999938574 * u.amu
 
         job.doc["T_SI"] = [
             units.quantity_to_string(units.kelvin_from_reduced(kT, ref_energy))
