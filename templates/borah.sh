@@ -1,4 +1,5 @@
 {% extends "base_script.sh" %}
+export HOOMD_WALLTIME_STOP=$((`date +%s` + 12 * 3600 - 10 * 60))
 {% block header %}
 {% set gpus = operations|map(attribute='directives.ngpu')|sum %}
 #!/bin/bash
