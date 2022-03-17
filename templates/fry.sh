@@ -10,7 +10,7 @@
 #SBATCH --nodelist={{ nodelist }}
 {% endif %}
 {% if walltime %}
-#SBATCH -t {{ 48|format_timedelta }}
+#SBATCH -t {{ 168|format_timedelta }}
 {% endif %}
 {% if gpus %}
 #SBATCH --gres gpu:{{ gpus }}
@@ -20,4 +20,5 @@
 {% block tasks %}
 #SBATCH --ntasks={{ np_global }}
 {% endblock %}
+export HOOMD_WALLTIME_STOP=$((`date +%s` + 168 * 3600 - 10 * 60))
 {% endblock %}
