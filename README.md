@@ -107,7 +107,6 @@ Beyond the officially supported [flow environments](https://docs.signac.io/proje
 * R2
 * Borah
 * Fry
-* Kestrel
 
 ## Included shell scripts
 <details>

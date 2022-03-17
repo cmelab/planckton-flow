@@ -19,4 +19,5 @@
 {% block tasks %}
 #SBATCH --ntasks={{ np_global }}
 {% endblock %}
+export HOOMD_WALLTIME_STOP=$((`date +%s` + 48 * 3600 - 10 * 60))
 {% endblock %}
