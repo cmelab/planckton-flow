@@ -10,5 +10,4 @@ workspace/
 old/
 signac.rc
 fry/
-kestrel/
 *.json
