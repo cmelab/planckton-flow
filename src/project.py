@@ -158,9 +158,9 @@ def sample(job):
             shrink_steps=job.sp.shrink_steps,
             shrink_kT=job.sp.shrink_kT,
             shrink_tau=job.sp.shrink_tau,
-            mode=job.sp.mode,
             target_length=target_length,
-            restart=restart
+            restart=restart,
+            nlist=job.sp.nlist
         )
 
 

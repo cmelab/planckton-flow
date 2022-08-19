@@ -76,7 +76,8 @@ parameters = {
     "shrink_tau": [1.0],
     # Whether to remove hydrogen atoms
     "remove_hydrogens": [False],  # True or False
-    "mode": ["gpu"]  # "cpu" or "gpu"
+    # update the neighbor list used by hoomd
+    "nlist": ['Cell'] 
 }
 
 

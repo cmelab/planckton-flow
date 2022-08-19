@@ -7,5 +7,4 @@
 {% endblock tasks %}
 {% block header %}
 {{ super() -}}
-export HOOMD_WALLTIME_STOP=$((`date +%s` + 24 * 3600 - 10 * 60))
 {% endblock header %}
